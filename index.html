@@ -163,6 +163,12 @@
             <i class="fas fa-key"></i> Public PGP Key
         </a>
     </div>
+    <div style="margin-top: 2rem; border-top: 1px solid #30363d; padding-top: 1rem;">
+        <p style="font-size: 0.75rem; font-family: monospace; color: #8b949e; margin-bottom: 0;">
+            PGP Fingerprint:<br>
+            <span style="color: var(--accent-color);">EB95 4BDF 9092 5F69 0BB8 7C96 F7D1 4AF0 D0CA 5177</span>
+        </p>
+    </div>
 </div>
 
 <script>
@@ -174,10 +180,17 @@
             // Change icon to checkmark
             icon.classList.remove('fa-copy', 'far');
             icon.classList.add('fa-check', 'fas');
-            icon.style.color = "#3fb950"; // GitHub success green
+            icon.style.color = "#3fb950"; 
 
             // Reset after 2 seconds
             setTimeout(() => {
                 icon.classList.remove('fa-check', 'fas');
                 icon.classList.add('fa-copy', 'far');
                 icon.style.color = "";
+            }, 2000);
+        });
+    }
+</script>
+
+</body>
+</html>
