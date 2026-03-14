@@ -31,19 +31,16 @@
         body::before {
             content: "";
             position: absolute;
-            width: 300px;
-            height: 300px;
+            width: 300px; height: 300px;
             background: radial-gradient(circle, rgba(88, 166, 255, 0.1) 0%, rgba(13, 17, 23, 0) 70%);
-            top: -100px;
-            right: -100px;
-            z-index: -1;
+            top: -100px; right: -100px; z-index: -1;
         }
 
         .container {
             background-color: var(--container-bg);
             border: 1px solid #30363d;
             border-radius: 12px;
-            padding: 3rem;
+            padding: 2.5rem;
             max-width: 450px;
             width: 90%;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
@@ -56,83 +53,41 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        h1 {
-            color: var(--text-bright);
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-            letter-spacing: -1px;
-        }
+        h1 { color: var(--text-bright); font-size: 2.5rem; margin-bottom: 0.5rem; letter-spacing: -1px; }
+        .tagline { color: var(--accent-color); font-family: monospace; font-size: 1.1rem; margin-bottom: 1.5rem; }
 
-        .tagline {
-            color: var(--accent-color);
-            font-family: monospace;
-            font-size: 1.1rem;
-            margin-bottom: 0.5rem;
-        }
+        /* --- Music Widget CSS --- */
+        .pulse-green { color: #3fb950; animation: pulse-green-animation 2s infinite; }
+        @keyframes pulse-green-animation { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
 
-        .email-box {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            font-family: monospace;
-            margin-bottom: 1.5rem;
-            font-size: 1rem;
-            color: var(--text-primary);
-        }
+        .track-row { display: flex; justify-content: space-between; gap: 10px; margin-top: 4px; }
+        .track-name { color: var(--text-bright); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; text-align: left; }
+        .artist-name { color: var(--accent-color); font-size: 0.75rem; text-align: right; white-space: nowrap; }
 
-        .reverse-email {
-            unicode-bidi: bidi-override;
-            direction: rtl;
-        }
-
-        .copy-btn {
-            background: none;
-            border: none;
-            color: var(--text-primary);
-            cursor: pointer;
-            padding: 4px;
-            font-size: 0.9rem;
-            transition: color 0.2s;
-            display: flex;
-            align-items: center;
-        }
-
-        .copy-btn:hover {
-            color: var(--accent-color);
-        }
-
-        p {
-            line-height: 1.6;
-            margin-bottom: 2rem;
-        }
+        /* --- UI Elements --- */
+        .email-box { display: flex; align-items: center; justify-content: center; gap: 8px; font-family: monospace; margin-bottom: 1.5rem; font-size: 1rem; }
+        .reverse-email { unicode-bidi: bidi-override; direction: rtl; }
+        .copy-btn { background: none; border: none; color: var(--text-primary); cursor: pointer; padding: 4px; font-size: 0.9rem; transition: 0.2s; }
+        .copy-btn:hover { color: var(--accent-color); }
 
         .links a {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin: 12px 0;
-            padding: 14px;
-            text-decoration: none;
-            color: var(--text-bright);
-            background: #21262d;
-            border: 1px solid #30363d;
-            border-radius: 8px;
-            font-weight: 500;
-            transition: all 0.2s ease-in-out;
+            position: relative; display: flex; align-items: center; justify-content: center; gap: 10px;
+            margin: 10px 0; padding: 12px; text-decoration: none;
+            color: var(--text-bright); background: #21262d; border: 1px solid #30363d;
+            border-radius: 8px; font-weight: 500; transition: 0.2s;
         }
+        .links a:hover { background: #30363d; border-color: var(--accent-color); transform: scale(1.02); }
 
-        .links a:hover {
-            background: #30363d;
-            border-color: var(--accent-color);
-            transform: scale(1.02);
-            box-shadow: 0 0 15px rgba(88, 166, 255, 0.2);
+        /* --- Tooltip CSS --- */
+        .links a::after {
+            content: attr(data-tooltip); position: absolute; bottom: 125%; left: 50%; transform: translateX(-50%);
+            background-color: #30363d; color: var(--text-bright); padding: 5px 10px; border-radius: 6px;
+            font-size: 0.75rem; white-space: nowrap; opacity: 0; visibility: hidden; transition: 0.3s;
+            border: 1px solid var(--accent-color); z-index: 10;
         }
+        .links a:hover::after { opacity: 1; visibility: visible; }
 
-        i {
-            font-size: 1.2rem;
-        }
+        p { line-height: 1.6; margin-bottom: 2rem; }
     </style>
 </head>
 <body>
@@ -140,7 +95,20 @@
 <div class="container">
     <h1>Mandelli.Dev</h1>
     <div class="tagline">> Father | IT Professional | Nerd </div>
-    
+
+    <div id="music-widget" style="background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 15px; margin-bottom: 2rem; text-align: left;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #30363d; padding-bottom: 8px;">
+            <div style="font-size: 0.75rem; font-family: monospace; color: #8b949e; display: flex; align-items: center; gap: 6px;">
+                <i class="fas fa-headphones"></i> RECENT ROTATION
+            </div>
+            <div id="live-indicator" style="display: none; align-items: center; gap: 5px; font-family: monospace; font-size: 0.7rem; font-weight: bold; color: #3fb950;">
+                <span class="pulse-green">●</span> LIVE
+            </div>
+        </div>
+        <div id="track-list" style="font-family: monospace; font-size: 0.8rem; display: flex; flex-direction: column; gap: 8px;">
+            </div>
+    </div>
+
     <div class="email-box">
         <span class="reverse-email" id="email-text">ved.illednam@nosaj</span>
         <button class="copy-btn" onclick="copyEmail()" title="Copy Email">
@@ -157,16 +125,17 @@
         <a href="https://www.linkedin.com/in/jason-mandelli-898a7aa3/" target="_blank" data-tooltip="View my professional history">
             <i class="fab fa-linkedin"></i> LinkedIn
         </a>
-        <a href="https://instagram.com/jasonmandelli" target="_blank" data-tooltip="View my super amazing photos">
+        <a href="https://instagram.com/jasonmandelli" target="_blank" data-tooltip="View my amazing photos">
             <i class="fab fa-instagram"></i> Instagram
         </a>
         <a href="https://www.moxfield.com/users/medo" target="_blank" data-tooltip="View my cEDH lists and Brews">
             <i class="fas fa-layer-group"></i> Moxfield
         </a>
-        <a href="/public.asc" target="_blank" data-tooltip="Send me secrets">
+        <a href="/public.asc" download="jason_mandelli_public_key.asc" data-tooltip="Send me secrets">
             <i class="fas fa-key"></i> Public PGP Key
         </a>
     </div>
+
     <div style="margin-top: 2rem; border-top: 1px solid #30363d; padding-top: 1rem;">
         <p style="font-size: 0.75rem; font-family: monospace; color: #8b949e; margin-bottom: 0;">
             PGP Fingerprint:<br>
@@ -176,17 +145,45 @@
 </div>
 
 <script>
+    // --- Config ---
+    const API_KEY = '452d1e53691b35628314664820db7e1a';
+    const USERNAME = 'jasonmandelli';
+
+    async function updateMusic() {
+        const url = `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${USERNAME}&api_key=${API_KEY}&format=json&limit=5`;
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            const tracks = data.recenttracks.track;
+            const listContainer = document.getElementById('track-list');
+            const liveIndicator = document.getElementById('live-indicator');
+            
+            listContainer.innerHTML = ''; // Clear previous
+
+            tracks.forEach((track, index) => {
+                const isNowPlaying = track['@attr'] && track['@attr'].nowplaying === 'true';
+                if (index === 0) liveIndicator.style.display = isNowPlaying ? 'flex' : 'none';
+
+                const row = document.createElement('div');
+                row.className = 'track-row';
+                row.style.opacity = isNowPlaying ? '1' : '0.5';
+                row.innerHTML = `
+                    <span class="track-name">${isNowPlaying ? '➔ ' : ''}${track.name}</span>
+                    <span class="artist-name">${track.artist['#text']}</span>
+                `;
+                listContainer.appendChild(row);
+            });
+        } catch (e) { console.warn("Music widget update failed."); }
+    }
+
+    // --- Email Copy Function ---
     function copyEmail() {
         const email = "jason@mandelli.dev";
         const icon = document.getElementById('copy-icon');
-        
         navigator.clipboard.writeText(email).then(() => {
-            // Change icon to checkmark
             icon.classList.remove('fa-copy', 'far');
             icon.classList.add('fa-check', 'fas');
-            icon.style.color = "#3fb950"; 
-
-            // Reset after 2 seconds
+            icon.style.color = "#3fb950";
             setTimeout(() => {
                 icon.classList.remove('fa-check', 'fas');
                 icon.classList.add('fa-copy', 'far');
@@ -194,6 +191,10 @@
             }, 2000);
         });
     }
+
+    // Initialize logic
+    updateMusic();
+    setInterval(updateMusic, 60000); // Check every minute
 </script>
 
 </body>
