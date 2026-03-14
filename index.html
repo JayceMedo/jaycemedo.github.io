@@ -14,25 +14,14 @@
             --accent-color: #58a6ff; 
             --text-primary: #c9d1d9;
             --text-bright: #ffffff;
-        }/* Custom scrollbar for the music list */
-        #track-list::-webkit-scrollbar {
-            width: 4px;
         }
 
-        #track-list::-webkit-scrollbar-track {
-            background: transparent;
-        }
+        /* Custom scrollbar for the music list */
+        #track-list::-webkit-scrollbar { width: 4px; }
+        #track-list::-webkit-scrollbar-track { background: transparent; }
+        #track-list::-webkit-scrollbar-thumb { background: #30363d; border-radius: 10px; }
+        #track-list::-webkit-scrollbar-thumb:hover { background: var(--accent-color); }
 
-        #track-list::-webkit-scrollbar-thumb {
-            background: #30363d;
-            border-radius: 10px;
-        }
-
-        #track-list::-webkit-scrollbar-thumb:hover {
-            background: var(--accent-color);
-        }
-
-        /* Fixed the missing bracket here */
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
@@ -40,11 +29,11 @@
             margin: 0;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
+            align-items: flex-start; /* Aligns to top */
             min-height: 100vh;
             overflow-y: auto;
             overflow-x: hidden;
-            padding: 2rem 0; 
+            padding: 1.5rem 0; /* Reduced top padding */
         }
 
         body::before {
@@ -59,25 +48,39 @@
             background-color: var(--container-bg);
             border: 1px solid #30363d;
             border-radius: 12px;
-            padding: 2.5rem;
+            padding: 1.5rem 2.5rem 2.5rem 2.5rem; /* Tighter top padding */
             max-width: 450px;
             width: 90%;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             animation: fadeIn 0.8s ease-out;
             text-align: center;
+            position: relative;
+            z-index: 1;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(10px); } /* Reduced travel for a tighter feel */
             to { opacity: 1; transform: translateY(0); }
         }
 
-        h1 { color: var(--text-bright); font-size: 2.5rem; margin-bottom: 0.5rem; letter-spacing: -1px; }
-        .tagline { color: var(--accent-color); font-family: monospace; font-size: 1.1rem; margin-bottom: 1.5rem; }
+        h1 { 
+            color: var(--text-bright); 
+            font-size: 2.5rem; 
+            margin-top: 0; 
+            margin-bottom: 0.2rem; 
+            letter-spacing: -1px; 
+        }
 
-        .email-box { display: flex; align-items: center; justify-content: center; gap: 8px; font-family: monospace; margin-bottom: 1.5rem; font-size: 1rem; color: var(--text-primary); }
+        .tagline { 
+            color: var(--accent-color); 
+            font-family: monospace; 
+            font-size: 1.1rem; 
+            margin-bottom: 1rem; 
+        }
+
+        .email-box { display: flex; align-items: center; justify-content: center; gap: 8px; font-family: monospace; margin-bottom: 1.5rem; font-size: 1rem; }
         .reverse-email { unicode-bidi: bidi-override; direction: rtl; }
-        .copy-btn { background: none; border: none; color: var(--text-primary); cursor: pointer; padding: 4px; font-size: 0.9rem; transition: color 0.2s; display: flex; align-items: center; }
+        .copy-btn { background: none; border: none; color: var(--text-primary); cursor: pointer; padding: 4px; font-size: 0.9rem; transition: color 0.2s; }
         .copy-btn:hover { color: var(--accent-color); }
 
         p { line-height: 1.6; margin-bottom: 1.5rem; }
@@ -89,6 +92,7 @@
             border-radius: 8px; font-weight: 500; transition: all 0.2s ease-in-out;
         }
         .links a:hover { background: #30363d; border-color: var(--accent-color); transform: scale(1.02); }
+        
         .links a::after {
             content: attr(data-tooltip); position: absolute; bottom: 125%; left: 50%; transform: translateX(-50%);
             background-color: #30363d; color: var(--text-bright); padding: 5px 10px; border-radius: 6px;
@@ -97,15 +101,9 @@
         }
         .links a:hover::after { opacity: 1; visibility: visible; }
 
-        /* --- Music Widget CSS --- */
         #music-widget { background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 15px; text-align: left; margin-bottom: 1.5rem; }
         .pulse-green { color: #3fb950; animation: pulse-green-animation 2s infinite; }
         @keyframes pulse-green-animation { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
-        .track-row { display: flex; justify-content: space-between; gap: 10px; margin-top: 4px; }
-        .track-name { color: var(--text-bright); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; text-align: left; font-size: 0.8rem; font-family: monospace; }
-        .track-name a:hover { text-decoration: underline !important; }
-        .artist-name { color: var(--accent-color); font-size: 0.75rem; text-align: right; white-space: nowrap; font-family: monospace; }
-        .artist-name a:hover { text-decoration: underline !important; }
     </style>
 </head>
 <body>
@@ -128,15 +126,14 @@
     </p>
 
     <div id="music-widget">
-    <div style="display: flex; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #30363d; padding-bottom: 8px;">
-        <div style="font-size: 0.7rem; font-family: monospace; color: #8b949e; display: flex; align-items: center; gap: 6px;">
-            <i class="fas fa-headphones"></i> RECENT ROTATION
+        <div style="display: flex; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #30363d; padding-bottom: 8px;">
+            <div style="font-size: 0.7rem; font-family: monospace; color: #8b949e; display: flex; align-items: center; gap: 6px;">
+                <i class="fas fa-headphones"></i> RECENT ROTATION
+            </div>
+        </div>
+        <div id="track-list" style="display: flex; flex-direction: column; gap: 4px; max-height: 150px; overflow-y: auto; padding-right: 5px;">
         </div>
     </div>
-    
-    <div id="track-list" style="display: flex; flex-direction: column; gap: 4px; max-height: 150px; overflow-y: auto; padding-right: 5px;">
-        </div>
-</div>
 
     <div class="links">
         <a href="https://www.linkedin.com/in/jason-mandelli-898a7aa3/" target="_blank" data-tooltip="View my professional history">
@@ -157,9 +154,9 @@
         <p style="font-size: 0.65rem; font-family: monospace; color: #8b949e; margin-bottom: 0;">
             PGP Fingerprint:<br>
             <span style="color: var(--accent-color);">
-    EB95 4BDF 9092 5F69 0BB8 7C96 F7D1 4AF0 
-    <a href="https://youtu.be/dQw4w9WgXcQ?si=NgLHpa9IrAgaOtOY" target="_blank" style="color: inherit; text-decoration: none; cursor: text;">D0CA 5177</a>
-</span>
+                EB95 4BDF 9092 5F69 0BB8 7C96 F7D1 4AF0 
+                <a href="https://youtu.be/dQw4w9WgXcQ?si=NgLHpa9IrAgaOtOY" target="_blank" style="color: inherit; text-decoration: none; cursor: text; position: relative; z-index: 2;">D0CA 5177</a>
+            </span>
         </p>
     </div>
 </div>
@@ -168,23 +165,21 @@
 async function updateMusic() {
     const API_KEY = '452d1e53691b35628314664820db7e1a';
     const USERNAME = 'jasonmandelli';
-    const url = `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${USERNAME}&api_key=${API_KEY}&format=json&limit=6`;
+    const url = `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${USERNAME}&api_key=${API_KEY}&format=json&limit=10`;
 
     try {
         const response = await fetch(url);
         const data = await response.json();
         const tracks = data.recenttracks.track;
         const listContainer = document.getElementById('track-list');
-        
         listContainer.innerHTML = ''; 
 
-        const displayTracks = tracks.slice(0, 6);
+        const displayTracks = tracks.slice(0, 8);
 
         displayTracks.forEach((track) => {
             const isNowPlaying = track['@attr'] && track['@attr'].nowplaying === 'true';
             const row = document.createElement('div');
             
-            row.className = 'track-row';
             row.style.padding = '6px 8px';
             row.style.borderRadius = '4px';
             row.style.display = 'flex';
@@ -193,14 +188,12 @@ async function updateMusic() {
             row.style.fontSize = '0.8rem';
             row.style.fontFamily = 'monospace';
 
-            // Calculate "Time Ago"
             let timeDisplay = '';
             if (isNowPlaying) {
                 timeDisplay = '<span class="pulse-green" style="font-size: 0.7rem;">● LIVE</span>';
             } else if (track.date && track.date.uts) {
                 const now = Math.floor(Date.now() / 1000);
                 const diff = now - parseInt(track.date.uts);
-                
                 if (diff < 60) timeDisplay = 'now';
                 else if (diff < 3600) timeDisplay = Math.floor(diff / 60) + 'm';
                 else if (diff < 86400) timeDisplay = Math.floor(diff / 3600) + 'h';
@@ -211,39 +204,31 @@ async function updateMusic() {
                 row.style.background = 'rgba(58, 185, 80, 0.1)';
                 row.style.border = '1px solid rgba(58, 185, 80, 0.3)';
                 row.style.opacity = '1';
-                
                 row.innerHTML = `
-                    <div style="display: flex; flex-direction: column; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 70%;">
+                    <div style="display: flex; flex-direction: column; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 70%; text-align: left;">
                         <span style="color: #3fb950; font-weight: bold;">
                             <a href="${track.url}" target="_blank" style="color: inherit; text-decoration: none;">${track.name}</a>
                         </span>
                         <span style="color: var(--text-bright); font-size: 0.7rem; opacity: 0.8;">${track.artist['#text']}</span>
                     </div>
-                    <div style="text-align: right; min-width: 50px;">
-                        ${timeDisplay}
-                    </div>
+                    <div style="text-align: right; min-width: 50px;">${timeDisplay}</div>
                 `;
             } else {
                 row.style.opacity = '0.5';
                 row.style.marginBottom = '2px';
                 row.innerHTML = `
-                    <div style="display: flex; flex-direction: column; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 75%;">
+                    <div style="display: flex; flex-direction: column; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 75%; text-align: left;">
                         <span style="color: var(--text-bright);">
                             <a href="${track.url}" target="_blank" style="color: inherit; text-decoration: none;">${track.name}</a>
                         </span>
                         <span style="color: var(--accent-color); font-size: 0.7rem;">${track.artist['#text']}</span>
                     </div>
-                    <div style="text-align: right; color: #8b949e; font-size: 0.7rem;">
-                        ${timeDisplay}
-                    </div>
+                    <div style="text-align: right; color: #8b949e; font-size: 0.7rem;">${timeDisplay}</div>
                 `;
             }
-            
             listContainer.appendChild(row);
         });
-    } catch (e) {
-        console.error("Music update error:", e);
-    }
+    } catch (e) { console.error("Music error:", e); }
 }
 
 function copyEmail() {
