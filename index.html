@@ -101,10 +101,11 @@
             <i id="copy-icon" class="far fa-copy"></i>
         </button>
     </div>
-
     <p>
         Welcome to my corner of the internet. <br>
-        Exploring the intersection of technology and human health.
+        See what i've been listening to,
+        Doing recently,
+        Or shoot me a message.
     </p>
 
     <div id="music-widget">
@@ -130,7 +131,7 @@
         <a href="https://www.moxfield.com/users/medo" target="_blank" data-tooltip="View my cEDH lists and Brews">
             <i class="fas fa-layer-group"></i> Moxfield
         </a>
-        <a href="/public.asc" download="jason_mandelli_public_key.asc" data-tooltip="Send me secrets">
+        <a href="/public.asc" download="mandelli_public_key.asc" data-tooltip="Send me secrets">
             <i class="fas fa-key"></i> Public PGP Key
         </a>
     </div>
@@ -145,8 +146,8 @@
 
 <script>
     // Paste your Last.fm API Key and Username here
-    const API_KEY = 'YOUR_API_KEY';
-    const USERNAME = 'YOUR_USERNAME';
+    const API_KEY = '452d1e53691b35628314664820db7e1a';
+    const USERNAME = 'jasonmandelli';
 
     async function updateMusic() {
         const url = `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${USERNAME}&api_key=${API_KEY}&format=json&limit=5`;
