@@ -158,43 +158,64 @@ async function updateMusic() {
         
         listContainer.innerHTML = ''; 
 
-        // We take the top 5 unique songs
-        const displayTracks = tracks.slice(0, 5);
+        const displayTracks = tracks.slice(0, 6);
 
         displayTracks.forEach((track) => {
             const isNowPlaying = track['@attr'] && track['@attr'].nowplaying === 'true';
             const row = document.createElement('div');
             
-            // Base styles for every row
             row.className = 'track-row';
             row.style.padding = '6px 8px';
             row.style.borderRadius = '4px';
             row.style.display = 'flex';
             row.style.justifyContent = 'space-between';
             row.style.alignItems = 'center';
-            row.style.transition = 'all 0.3s ease';
+            row.style.fontSize = '0.8rem';
+            row.style.fontFamily = 'monospace';
+
+            // Calculate "Time Ago"
+            let timeDisplay = '';
+            if (isNowPlaying) {
+                timeDisplay = '<span class="pulse-green" style="font-size: 0.7rem;">● LIVE</span>';
+            } else if (track.date && track.date.uts) {
+                const now = Math.floor(Date.now() / 1000);
+                const diff = now - parseInt(track.date.uts);
+                
+                if (diff < 60) timeDisplay = 'now';
+                else if (diff < 3600) timeDisplay = Math.floor(diff / 60) + 'm';
+                else if (diff < 86400) timeDisplay = Math.floor(diff / 3600) + 'h';
+                else timeDisplay = Math.floor(diff / 86400) + 'd';
+            }
 
             if (isNowPlaying) {
-                // Highlighting the LIVE song
-                row.style.background = 'rgba(58, 185, 80, 0.1)'; // Subtle green tint
+                row.style.background = 'rgba(58, 185, 80, 0.1)';
                 row.style.border = '1px solid rgba(58, 185, 80, 0.3)';
                 row.style.opacity = '1';
                 
                 row.innerHTML = `
-                    <span class="track-name" style="color: #3fb950; font-weight: bold;">
-                        <span class="pulse-green" style="margin-right: 6px;">●</span>
-                        <a href="${track.url}" target="_blank" style="color: inherit; text-decoration: none;">${track.name}</a>
-                    </span>
-                    <span class="artist-name" style="color: var(--text-bright); font-size: 0.7rem;">${track.artist['#text']}</span>
+                    <div style="display: flex; flex-direction: column; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 70%;">
+                        <span style="color: #3fb950; font-weight: bold;">
+                            <a href="${track.url}" target="_blank" style="color: inherit; text-decoration: none;">${track.name}</a>
+                        </span>
+                        <span style="color: var(--text-bright); font-size: 0.7rem; opacity: 0.8;">${track.artist['#text']}</span>
+                    </div>
+                    <div style="text-align: right; min-width: 50px;">
+                        ${timeDisplay}
+                    </div>
                 `;
             } else {
-                // Faded style for History
                 row.style.opacity = '0.5';
+                row.style.marginBottom = '2px';
                 row.innerHTML = `
-                    <span class="track-name">
-                        <a href="${track.url}" target="_blank" style="color: inherit; text-decoration: none;">${track.name}</a>
-                    </span>
-                    <span class="artist-name">${track.artist['#text']}</span>
+                    <div style="display: flex; flex-direction: column; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 75%;">
+                        <span style="color: var(--text-bright);">
+                            <a href="${track.url}" target="_blank" style="color: inherit; text-decoration: none;">${track.name}</a>
+                        </span>
+                        <span style="color: var(--accent-color); font-size: 0.7rem;">${track.artist['#text']}</span>
+                    </div>
+                    <div style="text-align: right; color: #8b949e; font-size: 0.7rem;">
+                        ${timeDisplay}
+                    </div>
                 `;
             }
             
