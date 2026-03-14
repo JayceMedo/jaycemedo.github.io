@@ -88,6 +88,15 @@
         .links a:hover::after { opacity: 1; visibility: visible; }
 
         p { line-height: 1.6; margin-bottom: 2rem; }
+        .track-name a:hover {
+    text-decoration: underline !important;
+    color: var(--text-bright);
+}
+
+.artist-name a:hover {
+    text-decoration: underline !important;
+    color: var(--accent-color);
+}
     </style>
 </head>
 <body>
@@ -161,17 +170,24 @@
             listContainer.innerHTML = ''; // Clear previous
 
             tracks.forEach((track, index) => {
-                const isNowPlaying = track['@attr'] && track['@attr'].nowplaying === 'true';
-                if (index === 0) liveIndicator.style.display = isNowPlaying ? 'flex' : 'none';
+            const isNowPlaying = track['@attr'] && track['@attr'].nowplaying === 'true';
+            if (index === 0) liveIndicator.style.display = isNowPlaying ? 'flex' : 'none';
 
-                const row = document.createElement('div');
-                row.className = 'track-row';
-                row.style.opacity = isNowPlaying ? '1' : '0.5';
-                row.innerHTML = `
-                    <span class="track-name">${isNowPlaying ? '➔ ' : ''}${track.name}</span>
-                    <span class="artist-name">${track.artist['#text']}</span>
-                `;
-                listContainer.appendChild(row);
+            const row = document.createElement('div');
+            row.className = 'track-row';
+            row.style.opacity = isNowPlaying ? '1' : '0.5';
+            
+            // We use track.url for the link back to Last.fm
+            row.innerHTML = `
+                <span class="track-name">
+                    ${isNowPlaying ? '➔ ' : ''}
+                    <a href="${track.url}" target="_blank" style="color: inherit; text-decoration: none;">${track.name}</a>
+                </span>
+                <span class="artist-name">
+                    <a href="${track.url}" target="_blank" style="color: inherit; text-decoration: none;">${track.artist['#text']}</a>
+                </span>
+            `;
+            listContainer.appendChild(row);
             });
         } catch (e) { console.warn("Music widget update failed."); }
     }
