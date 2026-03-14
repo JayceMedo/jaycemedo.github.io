@@ -173,7 +173,21 @@ async function updateMusic() {
         const listContainer = document.getElementById('track-list');
         listContainer.innerHTML = ''; 
 
-        const displayTracks = tracks.slice(0, 8);
+        // --- DE-DUPLICATION LOGIC START ---
+        // 1. Find the Live Track
+        const liveTrack = tracks.find(t => t['@attr'] && t['@attr'].nowplaying === 'true');
+        
+        // 2. Get all non-live tracks
+        let historyTracks = tracks.filter(t => !t['@attr'] || t['@attr'].nowplaying !== 'true');
+
+        // 3. Remove the history version of the live song if it exists
+        if (liveTrack) {
+            historyTracks = historyTracks.filter(t => t.name !== liveTrack.name);
+        }
+
+        // 4. Combine them back: Live on top, then enough history to fill up to 8 slots
+        const displayTracks = liveTrack ? [liveTrack, ...historyTracks.slice(0, 7)] : historyTracks.slice(0, 8);
+        // --- DE-DUPLICATION LOGIC END ---
 
         displayTracks.forEach((track) => {
             const isNowPlaying = track['@attr'] && track['@attr'].nowplaying === 'true';
