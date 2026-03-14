@@ -113,9 +113,10 @@
             <div style="font-size: 0.7rem; font-family: monospace; color: #8b949e; display: flex; align-items: center; gap: 6px;">
                 <i class="fas fa-headphones"></i> RECENT ROTATION
             </div>
-            <div id="live-indicator" style="display: none; align-items: center; gap: 5px; font-family: monospace; font-size: 0.7rem; font-weight: bold; color: #3fb950;">
-                <span class="pulse-green">●</span> LIVE
-            </div>
+            <div id="live-indicator" style="display: none; align-items: center; gap: 5px; font-family: monospace; font-size: 0.7rem; font-weight: bold; color: #3fb950; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;">
+                <span class="pulse-green">●</span> LIVE: 
+                <span id="current-live-song" style="color: var(--text-bright); margin-left: 5px;"></span>
+            </div>   
         </div>
         <div id="track-list" style="display: flex; flex-direction: column; gap: 8px;">
             </div>
@@ -131,7 +132,7 @@
         <a href="https://www.moxfield.com/users/medo" target="_blank" data-tooltip="View my cEDH lists and Brews">
             <i class="fas fa-layer-group"></i> Moxfield
         </a>
-        <a href="/public.asc" download="mandelli_public_key.asc" data-tooltip="Send me secrets">
+        <a href="public.asc" download="mandelli_public_key.asc" data-tooltip="Send me secrets">
             <i class="fas fa-key"></i> Public PGP Key
         </a>
     </div>
@@ -145,44 +146,36 @@
 </div>
 
 <script>
-    // Paste your Last.fm API Key and Username here
+async function updateMusic() {
     const API_KEY = '452d1e53691b35628314664820db7e1a';
     const USERNAME = 'jasonmandelli';
+    const url = `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${USERNAME}&api_key=${API_KEY}&format=json&limit=6`;
 
-    async function updateMusic() {
-        const url = `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${USERNAME}&api_key=${API_KEY}&format=json&limit=5`;
-        try {
-            const response = await fetch(url);
-            const data = await response.json();
-            const tracks = data.recenttracks.track;
-            const listContainer = document.getElementById('track-list');
-            const liveIndicator = document.getElementById('live-indicator');
-            
-            // Clear the previous tracks
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        const tracks = data.recenttracks.track;
+        const listContainer = document.getElementById('track-list');
+        const liveIndicator = document.getElementById('live-indicator');
+        const liveSongName = document.getElementById('current-live-song');
+        
         listContainer.innerHTML = ''; 
 
-        tracks.forEach((track, index) => {
-            const isNowPlaying = track['@attr'] && track['@attr'].nowplaying === 'true';
-            
-            if (index === 0) {
-                if (isNowPlaying) {
-                    // 1. Show the Live Indicator
-                    liveIndicator.style.display = 'flex';
-                    
-                    // 2. Update the Live track info (if you have specific spots for it)
-                    // But we SKIP adding it to the listContainer here to avoid the double-entry
-                    return; 
-                } else {
-                    // No song is live, so hide the indicator
-                    liveIndicator.style.display = 'none';
-                }
-            }
+        const liveTrack = tracks.find(t => t['@attr'] && t['@attr'].nowplaying === 'true');
+        const historyTracks = tracks.filter(t => !t['@attr'] || t['@attr'].nowplaying !== 'true').slice(0, 5);
 
-            // This part only runs for songs that AREN'T the "Now Playing" track
+        if (liveTrack) {
+            liveIndicator.style.display = 'flex';
+            liveSongName.innerText = `${liveTrack.name} - ${liveTrack.artist['#text']}`;
+        } else {
+            liveIndicator.style.display = 'none';
+            liveSongName.innerText = '';
+        }
+
+        historyTracks.forEach(track => {
             const row = document.createElement('div');
             row.className = 'track-row';
-            row.style.opacity = '0.5'; // History is always faded
-            
+            row.style.opacity = '0.5'; 
             row.innerHTML = `
                 <span class="track-name">
                     <a href="${track.url}" target="_blank" style="color: inherit; text-decoration: none;">${track.name}</a>
@@ -193,26 +186,28 @@
             `;
             listContainer.appendChild(row);
         });
-        } catch (e) { console.warn("Music widget update failed."); }
+    } catch (e) { 
+        console.error("Music update error:", e); 
     }
+}
 
-    function copyEmail() {
-        const email = "jason@mandelli.dev";
-        const icon = document.getElementById('copy-icon');
-        navigator.clipboard.writeText(email).then(() => {
-            icon.classList.remove('fa-copy', 'far');
-            icon.classList.add('fa-check', 'fas');
-            icon.style.color = "#3fb950";
-            setTimeout(() => {
-                icon.classList.remove('fa-check', 'fas');
-                icon.classList.add('fa-copy', 'far');
-                icon.style.color = "";
-            }, 2000);
-        });
-    }
+function copyEmail() {
+    const email = "jason@mandelli.dev";
+    const icon = document.getElementById('copy-icon');
+    navigator.clipboard.writeText(email).then(() => {
+        icon.classList.remove('fa-copy', 'far');
+        icon.classList.add('fa-check', 'fas');
+        icon.style.color = "#3fb950";
+        setTimeout(() => {
+            icon.classList.remove('fa-check', 'fas');
+            icon.classList.add('fa-copy', 'far');
+            icon.style.color = "";
+        }, 2000);
+    });
+}
 
-    updateMusic();
-    setInterval(updateMusic, 60000);
+updateMusic();
+setInterval(updateMusic, 60000);
 </script>
 
 </body>
