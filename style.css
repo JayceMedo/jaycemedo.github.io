@@ -2,9 +2,11 @@
     --bg: #050505;
     --card-bg: rgba(20, 20, 20, 0.6);
     --border: rgba(255, 255, 255, 0.1);
-    --accent-1: #10b981; /* Emerald for you */
-    --accent-2: #3b82f6; /* Blue for Daniel */
+    --accent-1: #10b981; /* Emerald Green */
+    --accent-2: #3b82f6; /* Electric Blue */
 }
+
+* { box-sizing: border-box; }
 
 body {
     background-color: var(--bg);
@@ -15,6 +17,7 @@ body {
     align-items: center;
     min-height: 100vh;
     margin: 0;
+    overflow-x: hidden;
 }
 
 .bento-container {
@@ -22,8 +25,9 @@ body {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: auto 1fr auto;
     gap: 1.5rem;
-    max-width: 1000px;
+    max-width: 1100px;
     width: 90%;
+    padding: 2rem 0;
 }
 
 .grid-item {
@@ -31,61 +35,119 @@ body {
     border: 1px solid var(--border);
     border-radius: 24px;
     padding: 2.5rem;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(12px);
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* Header Spans both columns */
-.header { grid-column: span 2; border: none; background: transparent; text-align: center; }
-.header h1 { font-weight: 800; letter-spacing: -2px; font-size: 3rem; margin: 0; }
+/* Header */
+.header { 
+    grid-column: span 2; 
+    border: none; 
+    background: transparent; 
+    text-align: center; 
+}
+.header h1 { 
+    font-weight: 800; 
+    letter-spacing: -3px; 
+    font-size: clamp(2rem, 8vw, 4rem); 
+    margin: 0; 
+}
 .header .dot { color: var(--accent-1); }
+.tagline { 
+    font-family: 'JetBrains Mono', monospace; 
+    opacity: 0.5; 
+    font-size: 0.9rem;
+}
 
 /* Profile Cards */
 .profile-card:hover {
     border-color: rgba(255, 255, 255, 0.3);
-    transform: translateY(-5px);
+    transform: translateY(-8px);
 }
 
-.your-card:hover { box-shadow: 0 0 30px rgba(16, 185, 129, 0.1); }
-.daniel-card:hover { box-shadow: 0 0 30px rgba(59, 130, 246, 0.1); }
+.your-card:hover { box-shadow: 0 0 40px rgba(16, 185, 129, 0.15); }
+.daniel-card:hover { box-shadow: 0 0 40px rgba(59, 130, 246, 0.15); }
 
 .label {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     text-transform: uppercase;
     color: var(--accent-1);
-    letter-spacing: 1px;
+    letter-spacing: 2px;
+    display: block;
+    margin-bottom: 0.5rem;
 }
 
 .daniel-card .label { color: var(--accent-2); }
+
+h2 { font-size: 2rem; margin: 0.5rem 0; font-weight: 800; }
+p { line-height: 1.6; color: rgba(255, 255, 255, 0.7); font-weight: 300; }
 
 /* Buttons */
 .btn {
     display: inline-block;
     margin-top: 1.5rem;
-    padding: 0.8rem 1.5rem;
+    padding: 0.8rem 1.8rem;
     border: 1px solid var(--border);
     border-radius: 50px;
     text-decoration: none;
     color: #fff;
-    font-weight: 500;
-    transition: 0.3s;
+    font-weight: 600;
+    transition: 0.3s ease;
 }
 
 .btn:hover {
     background: #fff;
     color: #000;
+    transform: scale(1.05);
 }
 
-/* Footer Stats */
-.footer { grid-column: span 2; display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; font-size: 0.8rem; opacity: 0.6; }
+/* Status Footer */
+.footer-status {
+    grid-column: span 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.2rem 2.5rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+}
+
+.status-left, .status-right { display: flex; align-items: center; gap: 1.5rem; }
 
 .pulse {
-    height: 8px;
-    width: 8px;
+    height: 8px; width: 8px;
     background: var(--accent-1);
     border-radius: 50%;
     display: inline-block;
     margin-right: 8px;
     box-shadow: 0 0 10px var(--accent-1);
+    animation: blink 2s infinite;
+}
+
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+.uptime-grid { display: flex; gap: 4px; }
+.bar { width: 3px; height: 12px; background: rgba(16, 185, 129, 0.2); border-radius: 1px; }
+.bar.highlight { background: var(--accent-1); height: 16px; }
+
+.meta-label { color: rgba(255, 255, 255, 0.3); margin-right: 5px; }
+.meta-value { color: var(--accent-2); }
+
+.gh-link {
+    text-decoration: none;
+    color: #fff;
+    padding: 6px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    transition: 0.3s;
+}
+.gh-link:hover { background: rgba(255, 255, 255, 0.15); border-color: #fff; }
+
+/* Mobile Responsiveness */
+@media (max-width: 850px) {
+    .bento-container { grid-template-columns: 1fr; }
+    .header, .footer-status { grid-column: span 1; }
+    .footer-status { flex-direction: column; gap: 1.5rem; text-align: center; }
+    .status-left, .status-right { flex-direction: column; gap: 1rem; }
 }
