@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daniel Mandelli</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90' font-family='Arial, sans-serif' fill='%2358a6ff'%3ED%3C/text%3E%3C/svg%3E">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script data-goatcounter="https://medo.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --container-bg: #161b22;
+            --accent-color: #58a6ff;
+            --text-primary: #c9d1d9;
+            --text-bright: #ffffff;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 1.5rem 0;
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            width: 300px; height: 300px;
+            background: radial-gradient(circle, rgba(88, 166, 255, 0.1) 0%, rgba(13, 17, 23, 0) 70%);
+            top: -100px; right: -100px; z-index: -1;
+        }
+
+        .container {
+            background-color: var(--container-bg);
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 1.5rem 2.5rem 2.5rem 2.5rem;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            animation: fadeIn 0.8s ease-out;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        .bio-tagline {
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            color: var(--text-bright);
+            font-size: 2.5rem;
+            margin-top: 0;
+            margin-bottom: 0.2rem;
+            letter-spacing: -1px;
+        }
+
+        .tagline {
+            color: var(--accent-color);
+            font-family: monospace;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .email-box { display: flex; align-items: center; justify-content: center; gap: 8px; font-family: monospace; margin-bottom: 1.5rem; font-size: 1rem; }
+        .copy-btn { background: none; border: none; color: var(--text-primary); cursor: pointer; padding: 4px; font-size: 0.9rem; transition: color 0.2s; }
+        .copy-btn:hover { color: var(--accent-color); }
+
+        p { line-height: 1.6; margin-bottom: 1.5rem; }
+
+        .links a {
+            position: relative; display: flex; align-items: center; justify-content: center; gap: 10px;
+            margin: 10px 0; padding: 12px; text-decoration: none;
+            color: var(--text-bright); background: #21262d; border: 1px solid #30363d;
+            border-radius: 8px; font-weight: 500; transition: all 0.2s ease-in-out;
+        }
+        .links a:hover { background: #30363d; border-color: var(--accent-color); transform: scale(1.02); }
+
+        .links a::after {
+            content: attr(data-tooltip); position: absolute; bottom: 125%; left: 50%; transform: translateX(-50%);
+            background-color: #30363d; color: var(--text-bright); padding: 5px 10px; border-radius: 6px;
+            font-size: 0.75rem; white-space: nowrap; opacity: 0; visibility: hidden; transition: 0.3s;
+            border: 1px solid var(--accent-color); z-index: 10;
+        }
+        .links a:hover::after { opacity: 1; visibility: visible; }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Daniel Mandelli</h1>
+    <div class="email-box">
+        <span id="email-text">dannymandelli@gmail.com</span>
+        <button class="copy-btn" onclick="copyEmail()" title="Copy Email">
+            <i id="copy-icon" class="far fa-copy"></i>
+        </button>
+    </div>
+    <div class="tagline">> Founder | Full Stack Engineer | Builder </div>
+    <p class="bio-tagline">
+        I'm a full stack engineer focused on building useful products that scale. <br>
+        I've worked with Internet Money and founded WebWise Technology. <br>
+        Most days I'm shipping across web, mobile, and blockchain.
+    </p>
+
+    <div class="links">
+        <a href="https://www.linkedin.com/in/daniel-mandelli/" target="_blank" data-tooltip="View my professional history">
+            <i class="fab fa-linkedin"></i> LinkedIn
+        </a>
+        <a href="https://github.com/dannymandelli" target="_blank" data-tooltip="View my projects">
+            <i class="fab fa-github"></i> GitHub
+        </a>
+        <a href="https://gitlab.com/dannymandelli" target="_blank" data-tooltip="View my repositories on GitLab">
+            <i class="fab fa-gitlab"></i> GitLab
+        </a>
+        <a href="https://webwisetechnology.com/" target="_blank" data-tooltip="Visit WebWise Technology">
+            <i class="fas fa-rocket"></i> WebWise Technology
+        </a>
+        <a href="https://danielmandelli.com/" target="_blank" data-tooltip="Visit my website">
+            <i class="fas fa-globe"></i> Website
+        </a>
+    </div>
+</div>
+
+<script>
+function copyEmail() {
+    const email = 'dannymandelli@gmail.com';
+    const icon = document.getElementById('copy-icon');
+    navigator.clipboard.writeText(email).then(() => {
+        icon.classList.remove('fa-copy', 'far');
+        icon.classList.add('fa-check', 'fas');
+        icon.style.color = '#3fb950';
+        setTimeout(() => {
+            icon.classList.remove('fa-check', 'fas');
+            icon.classList.add('fa-copy', 'far');
+            icon.style.color = '';
+        }, 2000);
+    });
+}
+</script>
+
+</body>
+</html>
