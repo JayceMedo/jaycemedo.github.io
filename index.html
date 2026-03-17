@@ -45,18 +45,6 @@
 
         <footer class="grid-item footer-status">
     <div class="status-left">
-        <div class="status-indicator">
-            <span class="pulse"></span>
-            <span class="status-text">SYSTEMS OPERATIONAL</span>
-        </div>
-        <div class="uptime-grid">
-            <span class="bar"></span><span class="bar"></span><span class="bar"></span>
-            <span class="bar"></span><span class="bar"></span><span class="bar"></span>
-            <span class="bar highlight"></span><span class="bar"></span>
-        </div>
-    </div>
-    
-    <div class="status-center">
         <div class="coord-box">
             <span class="meta-label">Carson City, NV</span> 
             <span class="meta-value">39.16° N, 119.76° W</span>
@@ -70,11 +58,18 @@
         </div>
     </div>
     
-    <div class="status-right">
+    <div class="status-middle">
         <div class="github-links">
             <a href="https://github.com/jaycemedo" class="gh-link"><i class="fab fa-github"></i> JASON GITHUB</a>
             <a href="https://github.com/dannymandelli" class="gh-link"><i class="fab fa-github"></i> DANIEL GITHUB</a>
             <a href="https://gitlab.com/dannymandelli" class="gh-link"><i class="fab fa-gitlab"></i> DANIEL GITLAB</a>
+        </div>
+    </div>
+    
+    <div class="status-right">
+        <div class="status-meta">
+            <span id="last-updated">Last updated: —</span>
+            <span id="live-status">Status: Checking...</span>
         </div>
     </div>
 </footer>
@@ -161,13 +156,92 @@
             }
         }
 
+        async function updateLastUpdated() {
+            try {
+                const res = await fetch('https://api.github.com/repos/jaycemedo/jaycemedo.github.io/commits?per_page=1');
+                const data = await res.json();
+                if (data[0]) {
+                    const date = new Date(data[0].commit.author.date);
+                    const formatted = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                    document.getElementById('last-updated').textContent = `Last updated: ${formatted}`;
+                }
+            } catch (e) {
+                console.error('Last updated error:', e);
+            }
+        }
+
+        let apiStatus = { weather: true, music: true, github: true };
+        let statusCycleIndex = 0;
+
+        async function checkAPIs() {
+            const apis = {
+                weather: 'https://api.open-meteo.com/v1/forecast?latitude=39.16&longitude=-119.76&current_weather=true',
+                music: 'https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=jasonmandelli&api_key=452d1e53691b35628314664820db7e1a&format=json&limit=1',
+                github: 'https://api.github.com/repos/jaycemedo/jaycemedo.github.io/commits?per_page=1'
+            };
+
+            // Check each API with a 3-second timeout
+            await Promise.all(
+                Object.entries(apis).map(async ([name, url]) => {
+                    try {
+                        const controller = new AbortController();
+                        const timeout = setTimeout(() => controller.abort(), 3000);
+
+                        const res = await fetch(url, { signal: controller.signal });
+                        clearTimeout(timeout);
+                        apiStatus[name] = res.ok;
+                    } catch (e) {
+                        apiStatus[name] = false;
+                    }
+                })
+            );
+
+            console.log('API Status:', apiStatus);
+            updateStatusDisplay();
+        }
+
+        function updateStatusDisplay() {
+            const statusEl = document.getElementById('live-status');
+            const online = Object.values(apiStatus).filter(Boolean).length;
+            const total = Object.keys(apiStatus).length;
+            const isAllOnline = online === total;
+
+            const messages = [
+                { text: isAllOnline ? 'All systems operational' : `${online}/${total} APIs online`, icon: isAllOnline ? '✓' : '✕' },
+                { text: `Weather API: ${apiStatus.weather ? 'Online' : 'Offline'}`, icon: apiStatus.weather ? '✓' : '✕' },
+                { text: `Music API: ${apiStatus.music ? 'Online' : 'Offline'}`, icon: apiStatus.music ? '✓' : '✕' },
+                { text: `GitHub API: ${apiStatus.github ? 'Online' : 'Offline'}`, icon: apiStatus.github ? '✓' : '✕' }
+            ];
+
+            const current = messages[statusCycleIndex % messages.length];
+            const color = current.icon === '✓' ? 'color: #10b981;' : 'color: #ef4444;';
+            statusEl.innerHTML = `<span style="${color}font-weight: bold;">${current.icon}</span> ${current.text}`;
+        }
+
+        function cycleStatus() {
+            statusCycleIndex++;
+            updateStatusDisplay();
+        }
+
+        function updateLiveStatus() {
+            // Check on load and every 30 seconds
+            checkAPIs();
+            // Cycle status display every 5 seconds
+            setInterval(cycleStatus, 5000);
+            // Re-check APIs every 30 seconds
+            setInterval(checkAPIs, 30000);
+        }
+
         // Check on page load
         checkMusicStatus();
         updateWeather();
+        updateLastUpdated();
+        updateLiveStatus();
         
-        // Check every 30 seconds for music, every 10 minutes for weather
+        // Check every 30 seconds for music, every 10 minutes for weather, every 5 minutes for last updated
         setInterval(checkMusicStatus, 30000);
         setInterval(updateWeather, 600000);
+        setInterval(updateLastUpdated, 300000);
     </script>
 
 </body>
