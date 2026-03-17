@@ -24,6 +24,10 @@
         <section class="grid-item profile-card your-card">
             <div class="card-content">
                 <span class="label">IT Professional</span>
+                <div class="live-indicator" id="live-indicator" style="display: none;">
+                    <span class="pulse"></span>
+                    <span class="live-text">Live Now - Listening to Music</span>
+                </div>
                 <h2>Jason Mandelli</h2>
                 <p>Specializing in PACS systems, ERP implementation, and high-availability infrastructure.</p>
                 <a href="/jason" class="btn">View Jason &rarr;</a>
@@ -73,6 +77,40 @@
     </div>
 </footer>
     </main>
+
+    <script>
+        async function checkMusicStatus() {
+            const API_KEY = '452d1e53691b35628314664820db7e1a';
+            const USERNAME = 'jasonmandelli';
+            const url = `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${USERNAME}&api_key=${API_KEY}&format=json&limit=1`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                const tracks = data.recenttracks.track;
+                const indicator = document.getElementById('live-indicator');
+                
+                // Check if there's a now playing track
+                const isNowPlaying = tracks.some(track => track['@attr'] && track['@attr'].nowplaying === 'true');
+                
+                if (isNowPlaying) {
+                    indicator.style.display = 'flex';
+                } else {
+                    indicator.style.display = 'none';
+                }
+            } catch (e) {
+                console.error("Music status check error:", e);
+                // Hide indicator on error
+                document.getElementById('live-indicator').style.display = 'none';
+            }
+        }
+
+        // Check on page load
+        checkMusicStatus();
+        
+        // Check every 30 seconds
+        setInterval(checkMusicStatus, 30000);
+    </script>
 
 </body>
 </html>

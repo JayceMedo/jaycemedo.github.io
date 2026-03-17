@@ -80,6 +80,19 @@ body {
 
 .daniel-card .label { color: var(--accent-2); }
 
+.live-indicator {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent-1);
+}
+
+.live-text {
+    opacity: 0.8;
+}
+
 h2 { font-size: 2rem; margin: 0.5rem 0; font-weight: 800; }
 p { line-height: 1.6; color: rgba(255, 255, 255, 0.7); font-weight: 300; }
 
