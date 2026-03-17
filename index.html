@@ -4,10 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mandelli.dev | Digital Hub</title>
+    
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
-    <script data-goatcounter="https://medo.goatcounter.com/count"
-        async src="//gc.zgo.at/count.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90' font-family='Arial, sans-serif' fill='%2358a6ff'%3EJ%3C/text%3E%3C/svg%3E">
+
+    <script data-goatcounter="https://medo.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </head>
 <body>
 
@@ -21,8 +25,8 @@
             <div class="card-content">
                 <span class="label">IT Professional</span>
                 <h2>Jason Mandelli</h2>
-                <p>Specializing in PACS systems, ERP and application implementation, and high-availability infrastructure.</p>
-                <a href="https://mandelli.dev/jason" class="btn" target="_blank" rel="noopener noreferrer">View Jason &rarr;</a>
+                <p>Specializing in PACS systems, ERP implementation, and high-availability infrastructure.</p>
+                <a href="jason.html" class="btn">View Jason &rarr;</a>
             </div>
         </section>
 
@@ -35,13 +39,32 @@
             </div>
         </section>
 
-        <footer class="grid-item footer">
-            <div class="status-indicator">
-                <span class="pulse"></span> Systems Operational
+        <footer class="grid-item footer-status">
+            <div class="status-left">
+                <div class="status-indicator">
+                    <span class="pulse"></span>
+                    <span class="status-text">SYSTEMS OPERATIONAL</span>
+                </div>
+                <div class="uptime-grid">
+                    <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+                    <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+                    <span class="bar highlight"></span><span class="bar"></span>
+                </div>
             </div>
-            <div class="links">
-                <a href="https://github.com/jaycemedo">Jason's Github</a>
-                <a href="https://github.com/daniel-username">Daniel's GitHub</a>
+            
+            <div class="status-right">
+                <div class="meta-item">
+                    <span class="meta-label">LATENCY</span>
+                    <span class="meta-value">24ms</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">NODE</span>
+                    <span class="meta-value">v20.26.0</span>
+                </div>
+                <div class="github-links">
+                    <a href="https://github.com/jmandelli" class="gh-link"><i class="fab fa-github"></i> JASON</a>
+                    <a href="https://github.com/DanielMandelli" class="gh-link"><i class="fab fa-github"></i> DANIEL</a>
+                </div>
             </div>
         </footer>
     </main>
