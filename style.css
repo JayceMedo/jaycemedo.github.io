@@ -1,0 +1,91 @@
+:root {
+    --bg: #050505;
+    --card-bg: rgba(20, 20, 20, 0.6);
+    --border: rgba(255, 255, 255, 0.1);
+    --accent-1: #10b981; /* Emerald for you */
+    --accent-2: #3b82f6; /* Blue for Daniel */
+}
+
+body {
+    background-color: var(--bg);
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.bento-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto 1fr auto;
+    gap: 1.5rem;
+    max-width: 1000px;
+    width: 90%;
+}
+
+.grid-item {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 2.5rem;
+    backdrop-filter: blur(10px);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Header Spans both columns */
+.header { grid-column: span 2; border: none; background: transparent; text-align: center; }
+.header h1 { font-weight: 800; letter-spacing: -2px; font-size: 3rem; margin: 0; }
+.header .dot { color: var(--accent-1); }
+
+/* Profile Cards */
+.profile-card:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-5px);
+}
+
+.your-card:hover { box-shadow: 0 0 30px rgba(16, 185, 129, 0.1); }
+.daniel-card:hover { box-shadow: 0 0 30px rgba(59, 130, 246, 0.1); }
+
+.label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: var(--accent-1);
+    letter-spacing: 1px;
+}
+
+.daniel-card .label { color: var(--accent-2); }
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    margin-top: 1.5rem;
+    padding: 0.8rem 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    text-decoration: none;
+    color: #fff;
+    font-weight: 500;
+    transition: 0.3s;
+}
+
+.btn:hover {
+    background: #fff;
+    color: #000;
+}
+
+/* Footer Stats */
+.footer { grid-column: span 2; display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; font-size: 0.8rem; opacity: 0.6; }
+
+.pulse {
+    height: 8px;
+    width: 8px;
+    background: var(--accent-1);
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+    box-shadow: 0 0 10px var(--accent-1);
+}
