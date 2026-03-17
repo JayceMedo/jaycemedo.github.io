@@ -180,6 +180,14 @@ p { line-height: 1.6; color: rgba(255, 255, 255, 0.7); font-weight: 300; }
     align-items: flex-start;
 }
 
+.weather-info {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent-1);
+    margin-top: 0.25rem;
+    opacity: 0.8;
+}
+
 .coord-divider {
     width: 1px;
     height: 20px;

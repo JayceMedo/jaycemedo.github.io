@@ -60,11 +60,13 @@
         <div class="coord-box">
             <span class="meta-label">Carson City, NV</span> 
             <span class="meta-value">39.16° N, 119.76° W</span>
+            <div class="weather-info" id="weather-carson"></div>
         </div>
         <div class="coord-divider"></div>
         <div class="coord-box">
             <span class="meta-label">Providence, RI</span> 
             <span class="meta-value">41.82° N, 71.41° W</span>
+            <div class="weather-info" id="weather-providence"></div>
         </div>
     </div>
     
@@ -105,11 +107,67 @@
             }
         }
 
+        async function updateWeather() {
+            const locations = [
+                { id: 'weather-carson', lat: 39.16, lon: -119.76 },
+                { id: 'weather-providence', lat: 41.82, lon: -71.41 }
+            ];
+
+            // Weather code to description mapping (simplified)
+            const weatherDescriptions = {
+                0: 'Clear sky',
+                1: 'Mainly clear',
+                2: 'Partly cloudy',
+                3: 'Overcast',
+                45: 'Fog',
+                48: 'Depositing rime fog',
+                51: 'Light drizzle',
+                53: 'Moderate drizzle',
+                55: 'Dense drizzle',
+                56: 'Light freezing drizzle',
+                57: 'Dense freezing drizzle',
+                61: 'Slight rain',
+                63: 'Moderate rain',
+                65: 'Heavy rain',
+                66: 'Light freezing rain',
+                67: 'Heavy freezing rain',
+                71: 'Slight snow',
+                73: 'Moderate snow',
+                75: 'Heavy snow',
+                77: 'Snow grains',
+                80: 'Slight rain showers',
+                81: 'Moderate rain showers',
+                82: 'Violent rain showers',
+                85: 'Slight snow showers',
+                86: 'Heavy snow showers',
+                95: 'Thunderstorm',
+                96: 'Thunderstorm with slight hail',
+                99: 'Thunderstorm with heavy hail'
+            };
+
+            for (const loc of locations) {
+                try {
+                    const url = `https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}&current_weather=true&temperature_unit=fahrenheit`;
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    const temp = Math.round(data.current_weather.temperature);
+                    const code = data.current_weather.weathercode;
+                    const desc = weatherDescriptions[code] || 'Unknown';
+                    document.getElementById(loc.id).innerHTML = `${temp}°F, ${desc}`;
+                } catch (e) {
+                    console.error("Weather error:", e);
+                    document.getElementById(loc.id).innerHTML = 'Weather unavailable';
+                }
+            }
+        }
+
         // Check on page load
         checkMusicStatus();
+        updateWeather();
         
-        // Check every 30 seconds
+        // Check every 30 seconds for music, every 10 minutes for weather
         setInterval(checkMusicStatus, 30000);
+        setInterval(updateWeather, 600000);
     </script>
 
 </body>
