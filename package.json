@@ -1,0 +1,13 @@
+{
+  "name": "jaycemedo.github.io",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Local development setup for a static GitHub Pages site",
+  "scripts": {
+    "dev": "live-server --host=127.0.0.1 --port=5500 --open=/index.html --watch=.",
+    "dev:no-browser": "live-server --host=127.0.0.1 --port=5500 --no-browser --watch=."
+  },
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  }
+}
