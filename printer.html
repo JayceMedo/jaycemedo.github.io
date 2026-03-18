@@ -83,7 +83,6 @@
         }
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
 
-        /* Progress Styles */
         .main-progress {
             background: var(--card-bg);
             padding: 2rem;
@@ -195,7 +194,6 @@
         const PROXY_URL = "https://doot-toot-proxy.mandellijason.workers.dev/";
         const CAMERA_ENTITY = "camera.p2s_22e8aj5c1401485_camera";
 
-        // Logic for Sensors (JSON)
         async function updateDashboard() {
             const entityMap = {
                 "progress-percent": "sensor.p2s_22e8aj5c1401485_print_progress",
@@ -217,7 +215,6 @@
                         let val = data.state;
                         const el = document.getElementById(elementId);
 
-                        // --- NEW FORMATTING LOGIC ---
                         if (elementId === "time-left") {
                             const totalMinutes = parseFloat(val) * 60;
                             if (!isNaN(totalMinutes) && totalMinutes > 0) {
@@ -229,23 +226,20 @@
                             }
                         } 
                         else if (elementId === "progress-percent") {
-                            el.innerText = val + "%";
                             document.getElementById('progress-fill').style.width = val + "%";
+                            val = val + "%";
                         } 
                         else if (elementId === "gcode-name") {
-                            el.innerText = val.split('/').pop() || "Idle";
-                        } 
-                        else {
-                            el.innerText = val;
+                            val = val.split('/').pop() || "Idle";
                         }
 
-                        // Add units back to temps
-                        if (elementId.includes('temp') && !isNaN(val)) el.innerText += "°C";
-                        // --- END FORMATTING LOGIC ---
+                        el.innerText = val;
+                        if (elementId.includes('temp') && !isNaN(parseFloat(val))) el.innerText += "°C";
                     }
                 } catch (err) { console.error("Fetch failed", err); }
             }
 
+            // Layer count
             try {
                 const cur = await (await fetch(PROXY_URL + "sensor.p2s_22e8aj5c1401485_current_layer")).json();
                 const tot = await (await fetch(PROXY_URL + "sensor.p2s_22e8aj5c1401485_total_layer_count")).json();
@@ -253,14 +247,6 @@
             } catch (e) {}
         }
 
-            try {
-                const cur = await (await fetch(PROXY_URL + "sensor.p2s_22e8aj5c1401485_current_layer")).json();
-                const tot = await (await fetch(PROXY_URL + "sensor.p2s_22e8aj5c1401485_total_layer_count")).json();
-                document.getElementById('layer-count').innerText = `${cur.state} / ${tot.state}`;
-            } catch (e) {}
-        }
-
-        // Logic for Camera (Image)
         async function updateCamera() {
             const camImg = document.getElementById('printer-camera');
             const timeLabel = document.getElementById('last-cam-update');
@@ -272,9 +258,8 @@
             timeLabel.innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
         }
 
-        // Run updates
-        setInterval(updateDashboard, 30000); // Sensors every 30s
-        setInterval(updateCamera, 10000);    // Camera every 10s
+        setInterval(updateDashboard, 30000);
+        setInterval(updateCamera, 10000);
         
         updateDashboard();
         updateCamera();
