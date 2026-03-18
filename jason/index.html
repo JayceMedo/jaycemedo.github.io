@@ -30,11 +30,11 @@
             margin: 0;
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* Aligns to top */
+            align-items: flex-start;
             min-height: 100vh;
             overflow-y: auto;
             overflow-x: hidden;
-            padding: 1.5rem 0; /* Reduced top padding */
+            padding: 1.5rem 0;
         }
 
         body::before {
@@ -49,7 +49,7 @@
             background-color: var(--container-bg);
             border: 1px solid #30363d;
             border-radius: 12px;
-            padding: 1.5rem 2.5rem 2.5rem 2.5rem; /* Tighter top padding */
+            padding: 1.5rem 2.5rem 2.5rem 2.5rem;
             max-width: 450px;
             width: 90%;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
@@ -60,7 +60,7 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); } /* Reduced travel for a tighter feel */
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
@@ -136,8 +136,8 @@
     </div>
 
     <div class="links">
-        <a href="https://www.linkedin.com/in/jason-mandelli-898a7aa3/" target="_blank" data-tooltip="View my professional history">
-            <i class="fab fa-linkedin"></i> LinkedIn
+        <a href="https://mandelli.dev/printer" data-tooltip="View my live Bambu P2S stats">
+            <i class="fas fa-microchip"></i> 3D Prints Dashboard
         </a>
         <a href="https://instagram.com/jasonmandelli" target="_blank" data-tooltip="View my photography">
             <i class="fab fa-instagram"></i> Instagram
@@ -174,21 +174,14 @@ async function updateMusic() {
         const listContainer = document.getElementById('track-list');
         listContainer.innerHTML = ''; 
 
-        // --- DE-DUPLICATION LOGIC START ---
-        // 1. Find the Live Track
         const liveTrack = tracks.find(t => t['@attr'] && t['@attr'].nowplaying === 'true');
-        
-        // 2. Get all non-live tracks
         let historyTracks = tracks.filter(t => !t['@attr'] || t['@attr'].nowplaying !== 'true');
 
-        // 3. Remove the history version of the live song if it exists
         if (liveTrack) {
             historyTracks = historyTracks.filter(t => t.name !== liveTrack.name);
         }
 
-        // 4. Combine them back: Live on top, then enough history to fill up to 8 slots
         const displayTracks = liveTrack ? [liveTrack, ...historyTracks.slice(0, 7)] : historyTracks.slice(0, 8);
-        // --- DE-DUPLICATION LOGIC END ---
 
         displayTracks.forEach((track) => {
             const isNowPlaying = track['@attr'] && track['@attr'].nowplaying === 'true';
