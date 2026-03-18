@@ -57,9 +57,43 @@
             100% { opacity: 1; transform: scale(1); }
         }
 
-        /* Ensure smooth transition when badges appear */
-        #music-badge, #printer-badge {
-            animation: slideIn 0.4s ease-out;
+        /* Ping Button Styling */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .ping-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ping-btn:hover:not(:disabled) {
+            background: rgba(56, 189, 248, 0.1);
+            border-color: #38bdf8;
+            color: #38bdf8;
+        }
+
+        .ping-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .ping-count {
+            font-weight: 800;
+            opacity: 0.6;
+            font-size: 0.6rem;
         }
 
         @keyframes slideIn {
@@ -93,7 +127,14 @@
 
                 <h2>Jason Mandelli</h2>
                 <p>Specializing in PACS systems, ERP implementation, and high-availability infrastructure.</p>
-                <a href="/jason" class="btn">View Jason &rarr;</a>
+                
+                <div class="btn-group">
+                    <a href="/jason" class="btn">View Jason &rarr;</a>
+                    <button id="ping-btn" class="ping-btn" onclick="triggerPing()">
+                        <i class="fas fa-bell" id="ping-icon"></i> PING_ME
+                        <span class="ping-count" id="ping-display">[--]</span>
+                    </button>
+                </div>
             </div>
         </section>
 
@@ -141,8 +182,47 @@
     <script>
         const PROXY_URL = "https://api.mandelli.dev/";
         const PRINTER_STATUS_ENTITY = "sensor.p2s_22e8aj5c1401485_print_status";
+        let apiStatus = { weather: true, music: true, github: true, printer: true };
+        let statusCycleIndex = 0;
 
-        // 1. Music Status Check (Card & API List)
+        // --- NEW PING LOGIC ---
+        async function fetchPingCount() {
+            try {
+                const res = await fetch(PROXY_URL + 'ping_count');
+                const data = await res.json();
+                document.getElementById('ping-display').textContent = `[${data.state}]`;
+            } catch (e) { console.error("Counter failed", e); }
+        }
+
+        async function triggerPing() {
+            const btn = document.getElementById('ping-btn');
+            const icon = document.getElementById('ping-icon');
+            const display = document.getElementById('ping-display');
+
+            btn.disabled = true;
+            icon.className = "fas fa-spinner fa-spin";
+            
+            try {
+                const res = await fetch(PROXY_URL + 'ping-me', { method: 'POST' });
+                const data = await res.json();
+                
+                if (res.ok) {
+                    icon.className = "fas fa-check";
+                    if(data.count) display.textContent = `[${data.count}]`;
+                } else if (res.status === 429) {
+                    icon.className = "fas fa-clock";
+                }
+            } catch (e) {
+                icon.className = "fas fa-exclamation-triangle";
+            }
+
+            setTimeout(() => {
+                btn.disabled = false;
+                icon.className = "fas fa-bell";
+            }, 5000);
+        }
+
+        // --- EXISTING FUNCTIONS ---
         async function checkMusicStatus() {
             const API_KEY = '452d1e53691b35628314664820db7e1a';
             const USERNAME = 'jasonmandelli';
@@ -153,7 +233,6 @@
                 const data = await response.json();
                 const tracks = data.recenttracks.track;
                 const badge = document.getElementById('music-badge');
-                
                 const isNowPlaying = tracks.some(track => track['@attr'] && track['@attr'].nowplaying === 'true');
                 badge.style.display = isNowPlaying ? 'flex' : 'none';
                 apiStatus.music = true;
@@ -163,43 +242,27 @@
             }
         }
 
-        // 2. Printer Status Check (Card & API List)
         async function checkPrinterStatus() {
-    const PROXY_URL = "https://api.mandelli.dev/"; // Use your clean new domain
-    const STATUS_ENTITY = "sensor.p2s_22e8aj5c1401485_print_status";
-    
-    try {
-        const response = await fetch(PROXY_URL + STATUS_ENTITY);
-        if (response.ok) {
-            const data = await response.json();
-            // Convert to lowercase and trim to be safe
-            const status = data.state.toLowerCase().trim();
-            const badge = document.getElementById('printer-badge');
-            
-            // Added "running" and "busy" to the list based on your API return
-            const activeStates = ["printing", "preparing", "running", "busy", "moving"];
-            const isActive = activeStates.includes(status);
-            
-            badge.style.display = isActive ? 'flex' : 'none';
-            apiStatus.printer = true;
-            
-            console.log("DootToot confirmed state:", status);
+            try {
+                const response = await fetch(PROXY_URL + PRINTER_STATUS_ENTITY);
+                if (response.ok) {
+                    const data = await response.json();
+                    const status = data.state.toLowerCase().trim();
+                    const badge = document.getElementById('printer-badge');
+                    const activeStates = ["printing", "preparing", "running", "busy", "moving"];
+                    const isActive = activeStates.includes(status);
+                    badge.style.display = isActive ? 'flex' : 'none';
+                    apiStatus.printer = true;
+                }
+            } catch (e) {
+                apiStatus.printer = false;
+                document.getElementById('printer-badge').style.display = 'none';
+            }
         }
-    } catch (e) {
-        console.error("Printer Badge Error:", e);
-        apiStatus.printer = false;
-        document.getElementById('printer-badge').style.display = 'none';
-    }
-}
 
-        // 3. Weather Updates
         async function updateWeather() {
-            const locations = [
-                { id: 'weather-carson', lat: 39.16, lon: -119.76 },
-                { id: 'weather-providence', lat: 41.82, lon: -71.41 }
-            ];
+            const locations = [{ id: 'weather-carson', lat: 39.16, lon: -119.76 }, { id: 'weather-providence', lat: 41.82, lon: -71.41 }];
             const weatherDescriptions = { 0: 'Clear sky', 1: 'Mainly clear', 2: 'Partly cloudy', 3: 'Overcast', 95: 'Thunderstorm' };
-
             for (const loc of locations) {
                 try {
                     const url = `https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}&current_weather=true&temperature_unit=fahrenheit`;
@@ -213,44 +276,25 @@
             }
         }
 
-        // 4. GitHub Commits
         async function updateLastUpdated() {
-            const lastUpdatedEl = document.getElementById('last-updated');
             try {
-                // Pointing specifically to your main branch for accuracy
                 const res = await fetch('https://api.github.com/repos/jaycemedo/jaycemedo.github.io/commits/main');
-                
-                if (!res.ok) throw new Error('GitHub API Limit or Repo not found');
-                
+                if (!res.ok) throw new Error();
                 const data = await res.json();
-                if (data.commit && data.commit.author.date) {
-                    const date = new Date(data.commit.author.date);
-                    const formatted = date.toLocaleDateString('en-US', { 
-                        month: 'short', 
-                        day: 'numeric', 
-                        year: 'numeric' 
-                    });
-                    lastUpdatedEl.textContent = `Last updated: ${formatted}`;
-                    apiStatus.github = true;
-                }
+                const date = new Date(data.commit.author.date);
+                document.getElementById('last-updated').textContent = `Last updated: ${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+                apiStatus.github = true;
             } catch (e) { 
-                console.error('Last updated error:', e);
-                // Fallback to today's date or a static message so it's not "broken"
-                lastUpdatedEl.textContent = `Last updated: Recently`;
+                document.getElementById('last-updated').textContent = `Last updated: Recently`;
                 apiStatus.github = false; 
             }
         }
-
-        // 5. API Global Monitoring
-        let apiStatus = { weather: true, music: true, github: true, printer: true };
-        let statusCycleIndex = 0;
 
         function updateStatusDisplay() {
             const statusEl = document.getElementById('live-status');
             const online = Object.values(apiStatus).filter(Boolean).length;
             const total = Object.keys(apiStatus).length;
             const isAllOnline = online === total;
-
             const messages = [
                 { text: isAllOnline ? 'All systems operational' : `${online}/${total} APIs online`, icon: isAllOnline ? '✓' : '✕' },
                 { text: `Weather API: ${apiStatus.weather ? 'Online' : 'Offline'}`, icon: apiStatus.weather ? '✓' : '✕' },
@@ -258,19 +302,17 @@
                 { text: `GitHub API: ${apiStatus.github ? 'Online' : 'Offline'}`, icon: apiStatus.github ? '✓' : '✕' },
                 { text: `Printer API: ${apiStatus.printer ? 'Online' : 'Offline'}`, icon: apiStatus.printer ? '✓' : '✕' }
             ];
-
             const current = messages[statusCycleIndex % messages.length];
             const color = current.icon === '✓' ? 'color: #10b981;' : 'color: #ef4444;';
             statusEl.innerHTML = `<span style="${color}font-weight: bold;">${current.icon}</span> ${current.text}`;
         }
 
-        // Initialization
         function startCycles() {
             updateWeather();
             updateLastUpdated();
             checkMusicStatus();
             checkPrinterStatus();
-
+            fetchPingCount();
             setInterval(() => { statusCycleIndex++; updateStatusDisplay(); }, 5000);
             setInterval(checkMusicStatus, 30000);
             setInterval(checkPrinterStatus, 30000);
