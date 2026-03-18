@@ -207,15 +207,30 @@
 
         // 4. GitHub Commits
         async function updateLastUpdated() {
+            const lastUpdatedEl = document.getElementById('last-updated');
             try {
-                const res = await fetch('https://api.github.com/repos/jaycemedo/jaycemedo.github.io/commits?per_page=1');
+                // Pointing specifically to your main branch for accuracy
+                const res = await fetch('https://api.github.com/repos/jaycemedo/jaycemedo.github.io/commits/main');
+                
+                if (!res.ok) throw new Error('GitHub API Limit or Repo not found');
+                
                 const data = await res.json();
-                if (data[0]) {
-                    const date = new Date(data[0].commit.author.date);
-                    document.getElementById('last-updated').textContent = `Last updated: ${date.toLocaleDateString()}`;
+                if (data.commit && data.commit.author.date) {
+                    const date = new Date(data.commit.author.date);
+                    const formatted = date.toLocaleDateString('en-US', { 
+                        month: 'short', 
+                        day: 'numeric', 
+                        year: 'numeric' 
+                    });
+                    lastUpdatedEl.textContent = `Last updated: ${formatted}`;
                     apiStatus.github = true;
                 }
-            } catch (e) { apiStatus.github = false; }
+            } catch (e) { 
+                console.error('Last updated error:', e);
+                // Fallback to today's date or a static message so it's not "broken"
+                lastUpdatedEl.textContent = `Last updated: Recently`;
+                apiStatus.github = false; 
+            }
         }
 
         // 5. API Global Monitoring
