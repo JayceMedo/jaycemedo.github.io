@@ -12,6 +12,61 @@
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90' font-family='Arial, sans-serif' fill='%23ffffff'%3EM%3C/text%3E%3C/svg%3E">
 
     <script data-goatcounter="https://medo.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+
+    <style>
+        /* Live Badge Styles */
+        .badge-container {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 12px;
+            min-height: 28px;
+        }
+
+        .live-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
+
+        .music-badge { border-color: #10b981; color: #10b981; box-shadow: 0 0 10px rgba(16, 185, 129, 0.1); }
+        .printer-badge { border-color: #38bdf8; color: #38bdf8; box-shadow: 0 0 10px rgba(56, 189, 248, 0.1); }
+
+        .pulse, .pulse-blue {
+            height: 6px;
+            width: 6px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .pulse { background: #10b981; animation: badge-blink 1.5s infinite; }
+        .pulse-blue { background: #38bdf8; animation: badge-blink 1.5s infinite; }
+
+        @keyframes badge-blink {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        /* Ensure smooth transition when badges appear */
+        #music-badge, #printer-badge {
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
 <body>
 
@@ -24,10 +79,18 @@
         <section class="grid-item profile-card your-card">
             <div class="card-content">
                 <span class="label">IT Professional</span>
-                <div class="live-indicator" id="live-indicator" style="display: none;">
-                    <span class="pulse"></span>
-                    <span class="live-text">Live Now - Listening to Music</span>
+                
+                <div class="badge-container">
+                    <div class="live-badge music-badge" id="music-badge" style="display: none;">
+                        <span class="pulse"></span>
+                        <span class="badge-text"><i class="fas fa-headphones"></i> LISTENING</span>
+                    </div>
+                    <div class="live-badge printer-badge" id="printer-badge" style="display: none;">
+                        <span class="pulse-blue"></span>
+                        <span class="badge-text"><i class="fas fa-print"></i> PRINTING</span>
+                    </div>
                 </div>
+
                 <h2>Jason Mandelli</h2>
                 <p>Specializing in PACS systems, ERP implementation, and high-availability infrastructure.</p>
                 <a href="/jason" class="btn">View Jason &rarr;</a>
@@ -76,6 +139,10 @@
     </main>
 
     <script>
+        const PROXY_URL = "https://doot-to-proxy.mandellijason.workers.dev/";
+        const PRINTER_STATUS_ENTITY = "sensor.p2s_22e8aj5c1401485_print_status";
+
+        // 1. Music Status Check (Card & API List)
         async function checkMusicStatus() {
             const API_KEY = '452d1e53691b35628314664820db7e1a';
             const USERNAME = 'jasonmandelli';
@@ -85,84 +152,75 @@
                 const response = await fetch(url);
                 const data = await response.json();
                 const tracks = data.recenttracks.track;
-                const indicator = document.getElementById('live-indicator');
+                const badge = document.getElementById('music-badge');
                 
                 const isNowPlaying = tracks.some(track => track['@attr'] && track['@attr'].nowplaying === 'true');
-                
-                indicator.style.display = isNowPlaying ? 'flex' : 'none';
-            } catch (e) {
-                console.error("Music status check error:", e);
-                document.getElementById('live-indicator').style.display = 'none';
+                badge.style.display = isNowPlaying ? 'flex' : 'none';
+                apiStatus.music = true;
+            } catch (e) { 
+                apiStatus.music = false;
+                document.getElementById('music-badge').style.display = 'none';
             }
         }
 
+        // 2. Printer Status Check (Card & API List)
+        async function checkPrinterStatus() {
+            try {
+                const response = await fetch(PROXY_URL + PRINTER_STATUS_ENTITY);
+                if (response.ok) {
+                    const data = await response.json();
+                    const status = data.state.toLowerCase();
+                    const badge = document.getElementById('printer-badge');
+                    
+                    const isActive = (status === "printing" || status === "preparing");
+                    badge.style.display = isActive ? 'flex' : 'none';
+                    apiStatus.printer = true;
+                } else {
+                    apiStatus.printer = false;
+                }
+            } catch (e) {
+                apiStatus.printer = false;
+                document.getElementById('printer-badge').style.display = 'none';
+            }
+        }
+
+        // 3. Weather Updates
         async function updateWeather() {
             const locations = [
                 { id: 'weather-carson', lat: 39.16, lon: -119.76 },
                 { id: 'weather-providence', lat: 41.82, lon: -71.41 }
             ];
-
-            const weatherDescriptions = {
-                0: 'Clear sky', 1: 'Mainly clear', 2: 'Partly cloudy', 3: 'Overcast',
-                45: 'Fog', 48: 'Fog', 51: 'Light drizzle', 53: 'Moderate drizzle',
-                55: 'Dense drizzle', 61: 'Slight rain', 63: 'Moderate rain', 65: 'Heavy rain',
-                71: 'Slight snow', 73: 'Moderate snow', 75: 'Heavy snow', 95: 'Thunderstorm'
-            };
+            const weatherDescriptions = { 0: 'Clear sky', 1: 'Mainly clear', 2: 'Partly cloudy', 3: 'Overcast', 95: 'Thunderstorm' };
 
             for (const loc of locations) {
                 try {
                     const url = `https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}&current_weather=true&temperature_unit=fahrenheit`;
-                    const response = await fetch(url);
-                    const data = await response.json();
+                    const res = await fetch(url);
+                    const data = await res.json();
                     const temp = Math.round(data.current_weather.temperature);
                     const code = data.current_weather.weathercode;
-                    const desc = weatherDescriptions[code] || 'Cloudy';
-                    document.getElementById(loc.id).innerHTML = `${temp}°F, ${desc}`;
-                } catch (e) {
-                    document.getElementById(loc.id).innerHTML = 'Weather unavailable';
-                }
+                    document.getElementById(loc.id).innerHTML = `${temp}°F, ${weatherDescriptions[code] || 'Cloudy'}`;
+                    apiStatus.weather = true;
+                } catch (e) { apiStatus.weather = false; }
             }
         }
 
+        // 4. GitHub Commits
         async function updateLastUpdated() {
             try {
                 const res = await fetch('https://api.github.com/repos/jaycemedo/jaycemedo.github.io/commits?per_page=1');
                 const data = await res.json();
                 if (data[0]) {
                     const date = new Date(data[0].commit.author.date);
-                    const formatted = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-                    document.getElementById('last-updated').textContent = `Last updated: ${formatted}`;
+                    document.getElementById('last-updated').textContent = `Last updated: ${date.toLocaleDateString()}`;
+                    apiStatus.github = true;
                 }
-            } catch (e) { console.error('Last updated error:', e); }
+            } catch (e) { apiStatus.github = false; }
         }
 
-        // --- API STATUS TRACKER ---
+        // 5. API Global Monitoring
         let apiStatus = { weather: true, music: true, github: true, printer: true };
         let statusCycleIndex = 0;
-
-        async function checkAPIs() {
-            const apis = {
-                weather: 'https://api.open-meteo.com/v1/forecast?latitude=39.16&longitude=-119.76&current_weather=true',
-                music: 'https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=jasonmandelli&api_key=452d1e53691b35628314664820db7e1a&format=json&limit=1',
-                github: 'https://api.github.com/repos/jaycemedo/jaycemedo.github.io/commits?per_page=1',
-                printer: 'https://doot-toot-proxy.mandellijason.workers.dev/sensor.p2s_22e8aj5c1401485_print_status'
-            };
-
-            await Promise.all(
-                Object.entries(apis).map(async ([name, url]) => {
-                    try {
-                        const controller = new AbortController();
-                        const timeout = setTimeout(() => controller.abort(), 4000);
-                        const res = await fetch(url, { signal: controller.signal });
-                        clearTimeout(timeout);
-                        apiStatus[name] = res.ok;
-                    } catch (e) {
-                        apiStatus[name] = false;
-                    }
-                })
-            );
-            updateStatusDisplay();
-        }
 
         function updateStatusDisplay() {
             const statusEl = document.getElementById('live-status');
@@ -183,26 +241,20 @@
             statusEl.innerHTML = `<span style="${color}font-weight: bold;">${current.icon}</span> ${current.text}`;
         }
 
-        function cycleStatus() {
-            statusCycleIndex++;
-            updateStatusDisplay();
+        // Initialization
+        function startCycles() {
+            updateWeather();
+            updateLastUpdated();
+            checkMusicStatus();
+            checkPrinterStatus();
+
+            setInterval(() => { statusCycleIndex++; updateStatusDisplay(); }, 5000);
+            setInterval(checkMusicStatus, 30000);
+            setInterval(checkPrinterStatus, 30000);
+            setInterval(updateWeather, 600000);
         }
 
-        function updateLiveStatus() {
-            checkAPIs();
-            setInterval(cycleStatus, 5000);
-            setInterval(checkAPIs, 30000);
-        }
-
-        // Start everything
-        checkMusicStatus();
-        updateWeather();
-        updateLastUpdated();
-        updateLiveStatus();
-        
-        setInterval(checkMusicStatus, 30000);
-        setInterval(updateWeather, 600000);
-        setInterval(updateLastUpdated, 300000);
+        startCycles();
     </script>
 </body>
 </html>
