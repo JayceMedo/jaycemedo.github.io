@@ -3,266 +3,172 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DootToot Dashboard | mandelli.dev</title>
+    <title>DootToot | Live Print Monitor</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root {
-            --bg: #0f172a;
-            --card-bg: #1e293b;
-            --accent: #38bdf8;
-            --text-main: #f1f5f9;
-            --text-muted: #94a3b8;
-            --border: #334155;
-        }
+        :root { --accent: #38bdf8; --bg: #0a0a0a; --card-bg: #161616; }
+        body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; margin: 0; padding: 20px; }
+        .dashboard-container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; }
+        .card { background: var(--card-bg); border-radius: 24px; padding: 24px; border: 1px solid rgba(255,255,255,0.05); position: relative; }
+        
+        /* Camera Section */
+        .camera-box { position: relative; width: 100%; border-radius: 16px; overflow: hidden; background: #000; aspect-ratio: 4/3; }
+        #camera-stream { width: 100%; height: 100%; object-fit: cover; }
+        
+        /* Telemetry Header */
+        .telemetry-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .telemetry-title { font-size: 0.8rem; font-family: 'JetBrains Mono'; color: var(--accent); letter-spacing: 2px; font-weight: 800; margin: 0; }
+        #sync-time { font-size: 0.65rem; color: #444; font-family: 'JetBrains Mono'; }
 
-        body {
-            background-color: var(--bg);
-            color: var(--text-main);
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-        }
+        /* Stats Grid */
+        .hardware-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .stat-box { background: rgba(255,255,255,0.02); padding: 15px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); transition: border 0.3s ease; }
+        .stat-box:hover { border-color: rgba(56, 189, 248, 0.3); }
+        .stat-label { display: block; font-size: 0.65rem; color: #666; font-family: 'JetBrains Mono'; margin-bottom: 8px; text-transform: uppercase; }
+        .stat-value { font-size: 1.4rem; font-weight: 800; color: white; }
+        .stat-unit { font-size: 0.8rem; color: #444; margin-left: 4px; font-family: 'JetBrains Mono'; }
 
-        .dashboard { width: 100%; max-width: 1000px; }
+        /* Progress Section */
+        .progress-section { margin-top: 30px; }
+        .progress-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px; }
+        .progress-percent { font-size: 3.5rem; font-weight: 800; line-height: 0.9; letter-spacing: -2px; }
+        .progress-bar-bg { width: 100%; height: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; }
+        #progress-fill { width: 0%; height: 100%; background: var(--accent); box-shadow: 0 0 15px rgba(56, 189, 248, 0.4); transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1); }
 
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 1rem;
-        }
-
-        h1 span { color: var(--accent); }
-
-        .status-badge {
-            background: var(--card-bg);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            border: 1px solid var(--border);
-            text-transform: uppercase;
-        }
-
-        /* Camera Styles */
-        .camera-card { margin-bottom: 2rem; padding: 10px !important; }
-        .camera-container {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 16 / 9;
-            background: #000;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        #printer-camera {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-        .camera-overlay {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            background: rgba(0,0,0,0.7);
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 0.7rem;
-            color: var(--accent);
-            font-family: monospace;
-        }
-        .dot {
-            height: 8px;
-            width: 8px;
-            background-color: #ff4d4d;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 5px;
-            animation: blink 1.5s infinite;
-        }
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-
-        .main-progress {
-            background: var(--card-bg);
-            padding: 2rem;
-            border-radius: 16px;
-            margin-bottom: 2rem;
-            border: 1px solid var(--border);
-        }
-
-        .progress-meta {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-
-        .progress-bar-bg {
-            background: #334155;
-            height: 24px;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        #progress-fill {
-            height: 100%;
-            width: 0%; 
-            background: linear-gradient(90deg, #0ea5e9, #38bdf8);
-            box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
-            transition: width 1s ease-in-out;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .card {
-            background: var(--card-bg);
-            padding: 1.5rem;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-        }
-
-        .data-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .label { color: var(--text-muted); }
-        .value { font-weight: 600; color: var(--accent); }
+        @media (max-width: 768px) { .dashboard-container { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
-    <div class="dashboard">
-        <header>
-            <h1>DootToot <span>Lab</span></h1>
-            <div id="print-status" class="status-badge">Checking...</div>
-        </header>
-
-        <section class="camera-card card">
-            <h3>DootToot Live View</h3>
-            <div class="camera-container">
-                <img id="printer-camera" src="" alt="Printer Camera Feed">
-                <div class="camera-overlay">
-                    <span class="dot"></span> LIVE SNAPSHOT: <span id="last-cam-update">--:--</span>
-                </div>
+<div class="dashboard-container">
+    <div class="card">
+        <div class="camera-box">
+            <img id="camera-stream" src="" alt="Printer Stream Loading...">
+            <div style="position: absolute; top: 15px; left: 15px; background: rgba(0,0,0,0.7); padding: 6px 14px; border-radius: 20px; font-size: 0.65rem; border: 1px solid var(--accent); font-family: 'JetBrains Mono';">
+                <span style="color: var(--accent); animation: pulse 2s infinite;">●</span> LIVE_FEED
             </div>
-        </section>
+        </div>
 
-        <section class="main-progress">
-            <div class="progress-meta">
-                <span id="gcode-name">Loading file...</span>
-                <span id="progress-percent">0%</span>
+        <div class="progress-section">
+            <div class="progress-header">
+                <div>
+                    <span class="stat-label">CURRENT_STAGE</span>
+                    <span id="current-stage" style="font-size: 1.1rem; font-weight: 800; color: white; letter-spacing: 0.5px;">INITIALIZING</span>
+                </div>
+                <div class="progress-percent"><span id="print-progress">0</span><span style="font-size: 1.5rem; color: var(--accent); margin-left: 4px;">%</span></div>
             </div>
             <div class="progress-bar-bg">
                 <div id="progress-fill"></div>
             </div>
-            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 15px;">
-                Layer: <span id="layer-count" class="value">-- / --</span>
-            </p>
-        </section>
-
-        <div class="stats-grid">
-            <div class="card">
-                <h3>Temperatures</h3>
-                <div class="data-row"><span class="label">Nozzle</span><span id="nozzle-temp" class="value">--°C</span></div>
-                <div class="data-row"><span class="label">Heat Bed</span><span id="bed-temp" class="value">--°C</span></div>
-                <div class="data-row"><span class="label">Chamber</span><span id="chamber-temp" class="value">--°C</span></div>
-            </div>
-
-            <div class="card">
-                <h3>Hardware</h3>
-                <div class="data-row"><span class="label">Cooling Fan</span><span id="fan-speed" class="value">--%</span></div>
-                <div class="data-row"><span class="label">Speed Mode</span><span id="speed-profile" class="value">Standard</span></div>
-            </div>
-
-            <div class="card">
-                <h3>Material Usage</h3>
-                <div class="data-row"><span class="label">Est. Weight</span><span id="print-weight" class="value">--g</span></div>
-                <div class="data-row"><span class="label">Remaining Time</span><span id="time-left" class="value">--</span></div>
-            </div>
         </div>
     </div>
 
-    <script>
-        const PROXY_URL = "https://api.mandelli.dev/";
-        const CAMERA_ENTITY = "camera.p2s_22e8aj5c1401485_camera";
-
-        async function updateDashboard() {
-            const entityMap = {
-                "progress-percent": "sensor.p2s_22e8aj5c1401485_print_progress",
-                "nozzle-temp": "sensor.p2s_22e8aj5c1401485_nozzle_temperature",
-                "bed-temp": "sensor.p2s_22e8aj5c1401485_bed_temperature",
-                "chamber-temp": "sensor.p2s_22e8aj5c1401485_chamber_temperature",
-                "print-status": "sensor.p2s_22e8aj5c1401485_print_status",
-                "gcode-name": "sensor.p2s_22e8aj5c1401485_gcode_filename",
-                "fan-speed": "sensor.p2s_22e8aj5c1401485_cooling_fan_speed",
-                "print-weight": "sensor.p2s_22e8aj5c1401485_print_weight",
-                "time-left": "sensor.p2s_22e8aj5c1401485_remaining_time"
-            };
-
-            for (const [elementId, entityId] of Object.entries(entityMap)) {
-                try {
-                    const response = await fetch(PROXY_URL + entityId);
-                    if (response.ok) {
-                        const data = await response.json();
-                        let val = data.state;
-                        const el = document.getElementById(elementId);
-
-                        if (elementId === "time-left") {
-                            const totalMinutes = parseFloat(val) * 60;
-                            if (!isNaN(totalMinutes) && totalMinutes > 0) {
-                                const hours = Math.floor(totalMinutes / 60);
-                                const mins = Math.round(totalMinutes % 60);
-                                val = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
-                            } else {
-                                val = "0m";
-                            }
-                        } 
-                        else if (elementId === "progress-percent") {
-                            document.getElementById('progress-fill').style.width = val + "%";
-                            val = val + "%";
-                        } 
-                        else if (elementId === "gcode-name") {
-                            val = val.split('/').pop() || "Idle";
-                        }
-
-                        el.innerText = val;
-                        if (elementId.includes('temp') && !isNaN(parseFloat(val))) el.innerText += "°C";
-                    }
-                } catch (err) { console.error("Fetch failed", err); }
-            }
-
-            // Layer count
-            try {
-                const cur = await (await fetch(PROXY_URL + "sensor.p2s_22e8aj5c1401485_current_layer")).json();
-                const tot = await (await fetch(PROXY_URL + "sensor.p2s_22e8aj5c1401485_total_layer_count")).json();
-                document.getElementById('layer-count').innerText = `${cur.state} / ${tot.state}`;
-            } catch (e) {}
-        }
-
-        async function updateCamera() {
-            const camImg = document.getElementById('printer-camera');
-            const timeLabel = document.getElementById('last-cam-update');
-            const cacheBuster = new Date().getTime();
-            
-            camImg.src = `${PROXY_URL}${CAMERA_ENTITY}?t=${cacheBuster}`;
-            
-            const now = new Date();
-            timeLabel.innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-        }
-
-        setInterval(updateDashboard, 30000);
-        setInterval(updateCamera, 10000);
+    <div class="card">
+        <div class="telemetry-header">
+            <h2 class="telemetry-title">LIVE TELEMETRY</h2>
+            <span id="sync-time">SYNC: --:--:--</span>
+        </div>
         
-        updateDashboard();
-        updateCamera();
-    </script>
+        <div class="hardware-grid">
+            <div class="stat-box">
+                <span class="stat-label">NOZZLE_TEMP</span>
+                <span class="stat-value" id="nozzle-temp">--</span><span class="stat-unit">°C</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-label">BED_TEMP</span>
+                <span class="stat-value" id="bed-temp">--</span><span class="stat-unit">°C</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-label">CURRENT_LAYER</span>
+                <span class="stat-value" id="current-layer">--</span>
+                <span class="stat-unit">/ <span id="total-layers">--</span></span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-label">PRINT_LENGTH</span>
+                <span class="stat-value" id="print-length" style="font-size: 1.1rem;">--</span>
+            </div>
+        </div>
+
+        <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.05);">
+            <a href="/" style="color: #444; text-decoration: none; font-size: 0.7rem; font-family: 'JetBrains Mono'; transition: color 0.3s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='#444'">
+                <i class="fas fa-chevron-left"></i> RETURN_TO_HUB
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    const PROXY_URL = "https://api.mandelli.dev/";
+    const CAMERA_ENTITY = "camera.p2s_22e8aj5c1401485_camera";
+    
+    const SENSORS = {
+        "sensor.p2s_22e8aj5c1401485_print_progress": "print-progress",
+        "sensor.p2s_22e8aj5c1401485_nozzle_temperature": "nozzle-temp",
+        "sensor.p2s_22e8aj5c1401485_bed_temperature": "bed-temp",
+        "sensor.p2s_22e8aj5c1401485_current_layer": "current-layer",
+        "sensor.p2s_22e8aj5c1401485_total_layer_count": "total-layers",
+        "sensor.p2s_22e8aj5c1401485_current_stage": "current-stage",
+        "sensor.p2s_22e8aj5c1401485_print_length": "print-length"
+    };
+
+    function formatTime(minutes) {
+        if (!minutes || isNaN(minutes) || minutes == 0) return "CALCULATING...";
+        const h = Math.floor(minutes / 60);
+        const m = minutes % 60;
+        return h > 0 ? `${h}H ${m}M` : `${m}M`;
+    }
+
+    async function updateDashboard() {
+        try {
+            // Refresh Camera with Cache Buster
+            document.getElementById('camera-stream').src = `${PROXY_URL}${CAMERA_ENTITY}?t=${Date.now()}`;
+
+            // Batch Fetch
+            const fetchPromises = Object.keys(SENSORS).map(id => 
+                fetch(PROXY_URL + id).then(res => res.json())
+            );
+            
+            const results = await Promise.all(fetchPromises);
+
+            results.forEach((data, index) => {
+                const elementId = Object.values(SENSORS)[index];
+                let value = data.state;
+
+                if (elementId === 'print-progress') {
+                    const p = Math.round(value) || 0;
+                    document.getElementById(elementId).textContent = p;
+                    document.getElementById('progress-fill').style.width = p + '%';
+                } 
+                else if (elementId === 'print-length') {
+                    document.getElementById(elementId).textContent = formatTime(value);
+                }
+                else if (elementId === 'current-stage') {
+                    document.getElementById(elementId).textContent = value.toUpperCase().replace(/_/g, " ");
+                }
+                else if (elementId === 'nozzle-temp' || elementId === 'bed-temp') {
+                    document.getElementById(elementId).textContent = Math.round(value);
+                }
+                else {
+                    document.getElementById(elementId).textContent = value || "--";
+                }
+            });
+
+            // Update Sync Timestamp
+            const now = new Date();
+            document.getElementById('sync-time').textContent = `SYNC: ${now.toTimeString().split(' ')[0]}`;
+
+        } catch (e) {
+            console.error("Telemetry Sync Error:", e);
+            document.getElementById('sync-time').textContent = "SYNC: ERROR";
+        }
+    }
+
+    // High-frequency updates every 5 seconds
+    setInterval(updateDashboard, 5000);
+    updateDashboard();
+</script>
+
 </body>
 </html>
