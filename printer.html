@@ -144,7 +144,7 @@
         "sensor.p2s_22e8aj5c1401485_print_weight": "print-weight",
         "sensor.p2s_22e8aj5c1401485_start_time": "start-time",
         "sensor.p2s_22e8aj5c1401485_end_time": "end-time",
-        "sensor.p2s_22e8aj5c1401485_cover_image": "cover-image" // Fetched via attribute in loop
+        "image.p2s_22e8aj5c1401485_cover_image": "cover-image" // Fetched via attribute in loop
     };
 
     function formatTime(val) {
@@ -173,12 +173,20 @@
                 const elementId = Object.values(SENSORS)[index];
                 let value = data.state;
 
-                // Handle Image Attribute specifically
+                // Inside results.forEach...
                 if (elementId === 'cover-image') {
-                    if (data.attributes && data.attributes.entity_picture) {
-                        document.getElementById('cover-image').src = `https://ha.mandelli.dev${data.attributes.entity_picture}`;
+                // We check for 'entity_picture' in the attributes
+                if (data.attributes && data.attributes.entity_picture) {
+                    const fullUrl = `https://ha.mandelli.dev${data.attributes.entity_picture}`;
+                    const imgElement = document.getElementById('cover-image');
+        
+                // Only update if the URL has changed to prevent flickering
+                if (imgElement.src !== fullUrl) {
+                    imgElement.src = fullUrl;
+                    imgElement.style.opacity = "1"; // Ensure it's visible
+                        }
                     }
-                    return;
+                return;
                 }
 
                 if (elementId === 'print-progress') {
