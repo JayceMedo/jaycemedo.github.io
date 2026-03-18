@@ -165,24 +165,32 @@
 
         // 2. Printer Status Check (Card & API List)
         async function checkPrinterStatus() {
-            try {
-                const response = await fetch(PROXY_URL + PRINTER_STATUS_ENTITY);
-                if (response.ok) {
-                    const data = await response.json();
-                    const status = data.state.toLowerCase();
-                    const badge = document.getElementById('printer-badge');
-                    
-                    const isActive = (status === "printing" || status === "preparing");
-                    badge.style.display = isActive ? 'flex' : 'none';
-                    apiStatus.printer = true;
-                } else {
-                    apiStatus.printer = false;
-                }
-            } catch (e) {
-                apiStatus.printer = false;
-                document.getElementById('printer-badge').style.display = 'none';
-            }
+    const PROXY_URL = "https://api.mandelli.dev/"; // Use your clean new domain
+    const STATUS_ENTITY = "sensor.p2s_22e8aj5c1401485_print_status";
+    
+    try {
+        const response = await fetch(PROXY_URL + STATUS_ENTITY);
+        if (response.ok) {
+            const data = await response.json();
+            // Convert to lowercase and trim to be safe
+            const status = data.state.toLowerCase().trim();
+            const badge = document.getElementById('printer-badge');
+            
+            // Added "running" and "busy" to the list based on your API return
+            const activeStates = ["printing", "preparing", "running", "busy", "moving"];
+            const isActive = activeStates.includes(status);
+            
+            badge.style.display = isActive ? 'flex' : 'none';
+            apiStatus.printer = true;
+            
+            console.log("DootToot confirmed state:", status);
         }
+    } catch (e) {
+        console.error("Printer Badge Error:", e);
+        apiStatus.printer = false;
+        document.getElementById('printer-badge').style.display = 'none';
+    }
+}
 
         // 3. Weather Updates
         async function updateWeather() {
