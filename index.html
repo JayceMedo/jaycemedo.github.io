@@ -138,6 +138,15 @@
         flex-direction: column;
         height: 100%;
     }
+
+    /* Formatting for the commit message in footer */
+    #last-updated {
+        display: block;
+        max-width: 250px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 </style>
 </head>
 <body>
@@ -204,7 +213,6 @@
             <div class="status-middle">
                 <div class="github-links">
                     <a href="https://github.com/jaycemedo" class="gh-link"><i class="fab fa-github"></i> JASON GITHUB</a>
-                    <a href="/public.asc" class="gh-link"><i class="fas fa-key"></i> PGP KEY</a>
                     <a href="https://github.com/dannymandelli" class="gh-link"><i class="fab fa-github"></i> DANIEL GITHUB</a>
                     <a href="https://gitlab.com/dannymandelli" class="gh-link"><i class="fab fa-gitlab"></i> DANIEL GITLAB</a>
                 </div>
@@ -222,11 +230,9 @@
     <script>
         const PROXY_URL = "https://api.mandelli.dev/";
         const PRINTER_STATUS_ENTITY = "sensor.p2s_22e8aj5c1401485_print_status";
-        // Initialize status trackers
         let apiStatus = { weather: false, music: false, github: false, printer: false, ping: false };
         let statusCycleIndex = 0;
 
-        // --- PING LOGIC ---
         async function fetchPingCount() {
             try {
                 const res = await fetch(PROXY_URL + 'ping_count');
@@ -234,7 +240,6 @@
                 document.getElementById('ping-display').textContent = `[${data.state}]`;
                 apiStatus.ping = true;
             } catch (e) { 
-                console.error("Counter failed", e);
                 apiStatus.ping = false;
             }
         }
@@ -243,36 +248,26 @@
             const btn = document.getElementById('ping-btn');
             const icon = document.getElementById('ping-icon');
             const display = document.getElementById('ping-display');
-
             btn.disabled = true;
             icon.className = "fas fa-spinner fa-spin";
-            
             try {
                 const res = await fetch(PROXY_URL + 'ping-me', { method: 'POST' });
                 const data = await res.json();
-                
                 if (res.ok) {
                     icon.className = "fas fa-check";
                     if(data.count) display.textContent = `[${data.count}]`;
-                } else if (res.status === 429) {
-                    icon.className = "fas fa-clock";
-                }
-            } catch (e) {
-                icon.className = "fas fa-exclamation-triangle";
-            }
-
+                } else if (res.status === 429) { icon.className = "fas fa-clock"; }
+            } catch (e) { icon.className = "fas fa-exclamation-triangle"; }
             setTimeout(() => {
                 btn.disabled = false;
                 icon.className = "fas fa-bell";
             }, 5000);
         }
 
-        // --- DATA FETCHING ---
         async function checkMusicStatus() {
             const API_KEY = '452d1e53691b35628314664820db7e1a';
             const USERNAME = 'jasonmandelli';
             const url = `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${USERNAME}&api_key=${API_KEY}&format=json&limit=1`;
-
             try {
                 const response = await fetch(url);
                 const data = await response.json();
@@ -326,8 +321,13 @@
                 const res = await fetch('https://api.github.com/repos/jaycemedo/jaycemedo.github.io/commits/main');
                 if (!res.ok) throw new Error();
                 const data = await res.json();
+                
                 const date = new Date(data.commit.author.date);
-                document.getElementById('last-updated').textContent = `Last updated: ${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+                const message = data.commit.message.split('\n')[0]; // Get only the first line of the commit
+                const formattedDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                
+                // Show "Date: Message" in the footer
+                document.getElementById('last-updated').textContent = `Last update: ${formattedDate} (${message})`;
                 apiStatus.github = true;
             } catch (e) { 
                 document.getElementById('last-updated').textContent = `Last updated: Recently`;
@@ -335,11 +335,8 @@
             }
         }
 
-        // --- DISPLAY LOGIC ---
         function updateStatusDisplay() {
             const statusEl = document.getElementById('live-status');
-            
-            // Fade out
             statusEl.classList.add('status-fade-out');
 
             setTimeout(() => {
@@ -359,36 +356,23 @@
                 const current = messages[statusCycleIndex % messages.length];
                 const color = current.icon === '✓' ? 'color: #10b981;' : 'color: #ef4444;';
                 statusEl.innerHTML = `<span style="${color}font-weight: bold;">${current.icon}</span> ${current.text}`;
-                
-                // Fade back in
                 statusEl.classList.remove('status-fade-out');
             }, 300);
         }
 
         function startCycles() {
-            // Fetch everything immediately
             updateWeather();
             updateLastUpdated();
             checkMusicStatus();
             checkPrinterStatus();
             fetchPingCount();
-
-            // Set the first display after a short wait for fetches to finish
             setTimeout(updateStatusDisplay, 1200);
-
-            // Start rotation every 5 seconds
-            setInterval(() => { 
-                statusCycleIndex++; 
-                updateStatusDisplay(); 
-            }, 5000);
-
-            // Background refresh intervals
+            setInterval(() => { statusCycleIndex++; updateStatusDisplay(); }, 5000);
             setInterval(checkMusicStatus, 30000);
             setInterval(checkPrinterStatus, 30000);
             setInterval(updateWeather, 600000);
             setInterval(fetchPingCount, 60000);
         }
-
         startCycles();
     </script>
 </body>
