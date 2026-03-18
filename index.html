@@ -57,32 +57,55 @@
             100% { opacity: 1; transform: scale(1); }
         }
 
-        /* Ping Button Styling */
+        /* --- SYMMETRICAL BUTTON GROUP --- */
         .btn-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Two equal columns */
+            gap: 12px;
+            margin-top: 20px;
+            width: 100%;
         }
 
-        .ping-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
-            padding: 10px 15px;
-            border-radius: 8px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.7rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
+        /* Base Button Styles to match your existing .btn */
+        .btn, .ping-btn {
             display: flex;
             align-items: center;
+            justify-content: center;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            font-size: 0.85rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            height: 46px; /* Fixed height for perfect symmetry */
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        /* View Jason Button (Primary) */
+        .btn {
+            background: white;
+            color: black;
+        }
+
+        .btn:hover {
+            background: #e2e2e2;
+            transform: translateY(-1px);
+        }
+
+        /* Ping Me Button (Secondary) */
+        .ping-btn {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
             gap: 8px;
         }
 
         .ping-btn:hover:not(:disabled) {
-            background: rgba(56, 189, 248, 0.1);
-            border-color: #38bdf8;
-            color: #38bdf8;
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
         }
 
         .ping-btn:disabled {
@@ -91,9 +114,11 @@
         }
 
         .ping-count {
+            font-family: 'JetBrains Mono', monospace;
             font-weight: 800;
-            opacity: 0.6;
-            font-size: 0.6rem;
+            opacity: 0.5;
+            font-size: 0.7rem;
+            margin-left: 2px;
         }
 
         @keyframes slideIn {
@@ -131,7 +156,8 @@
                 <div class="btn-group">
                     <a href="/jason" class="btn">View Jason &rarr;</a>
                     <button id="ping-btn" class="ping-btn" onclick="triggerPing()">
-                        <i class="fas fa-bell" id="ping-icon"></i> PING_ME
+                        <i class="fas fa-bell" id="ping-icon"></i> 
+                        <span>Ping Me</span>
                         <span class="ping-count" id="ping-display">[--]</span>
                     </button>
                 </div>
@@ -185,7 +211,7 @@
         let apiStatus = { weather: true, music: true, github: true, printer: true };
         let statusCycleIndex = 0;
 
-        // --- NEW PING LOGIC ---
+        // --- PING LOGIC ---
         async function fetchPingCount() {
             try {
                 const res = await fetch(PROXY_URL + 'ping_count');
