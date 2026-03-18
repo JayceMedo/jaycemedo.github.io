@@ -13,30 +13,27 @@
         .dashboard-container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; }
         .card { background: var(--card-bg); border-radius: 24px; padding: 24px; border: 1px solid rgba(255,255,255,0.05); position: relative; }
         
-        /* Camera Section */
         .camera-box { position: relative; width: 100%; border-radius: 16px; overflow: hidden; background: #000; aspect-ratio: 4/3; }
         #camera-stream { width: 100%; height: 100%; object-fit: cover; }
         
-        /* Telemetry Header */
         .telemetry-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .telemetry-title { font-size: 0.8rem; font-family: 'JetBrains Mono'; color: var(--accent); letter-spacing: 2px; font-weight: 800; margin: 0; }
         #sync-time { font-size: 0.65rem; color: #444; font-family: 'JetBrains Mono'; }
 
-        /* Stats Grid */
         .hardware-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .stat-box { background: rgba(255,255,255,0.02); padding: 15px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); transition: border 0.3s ease; }
         .stat-box:hover { border-color: rgba(56, 189, 248, 0.3); }
-        .stat-label { display: block; font-size: 0.65rem; color: #666; font-family: 'JetBrains Mono'; margin-bottom: 8px; text-transform: uppercase; }
-        .stat-value { font-size: 1.4rem; font-weight: 800; color: white; }
-        .stat-unit { font-size: 0.8rem; color: #444; margin-left: 4px; font-family: 'JetBrains Mono'; }
+        .stat-label { display: block; font-size: 0.6rem; color: #666; font-family: 'JetBrains Mono'; margin-bottom: 8px; text-transform: uppercase; }
+        .stat-value { font-size: 1.2rem; font-weight: 800; color: white; }
+        .stat-unit { font-size: 0.75rem; color: #444; margin-left: 4px; font-family: 'JetBrains Mono'; }
 
-        /* Progress Section */
         .progress-section { margin-top: 30px; }
         .progress-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px; }
         .progress-percent { font-size: 3.5rem; font-weight: 800; line-height: 0.9; letter-spacing: -2px; }
         .progress-bar-bg { width: 100%; height: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; }
         #progress-fill { width: 0%; height: 100%; background: var(--accent); box-shadow: 0 0 15px rgba(56, 189, 248, 0.4); transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1); }
 
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
         @media (max-width: 768px) { .dashboard-container { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -73,28 +70,38 @@
         
         <div class="hardware-grid">
             <div class="stat-box">
-                <span class="stat-label">NOZZLE_TEMP</span>
-                <span class="stat-value" id="nozzle-temp">--</span><span class="stat-unit">°C</span>
+                <span class="stat-label">NOZZLE / BED</span>
+                <span class="stat-value"><span id="nozzle-temp">--</span>°</span>
+                <span class="stat-unit">/ <span id="bed-temp">--</span>°C</span>
             </div>
             <div class="stat-box">
-                <span class="stat-label">BED_TEMP</span>
-                <span class="stat-value" id="bed-temp">--</span><span class="stat-unit">°C</span>
+                <span class="stat-label">CHAMBER</span>
+                <span class="stat-value" id="chamber-temp">--</span><span class="stat-unit">°C</span>
             </div>
             <div class="stat-box">
-                <span class="stat-label">CURRENT_LAYER</span>
+                <span class="stat-label">LAYERS</span>
                 <span class="stat-value" id="current-layer">--</span>
                 <span class="stat-unit">/ <span id="total-layers">--</span></span>
             </div>
             <div class="stat-box">
-                <span class="stat-label">PRINT_LENGTH</span>
-                <span class="stat-value" id="print-length" style="font-size: 1.1rem;">--</span>
+                <span class="stat-label">EST_WEIGHT</span>
+                <span class="stat-value" id="print-weight">--</span><span class="stat-unit">G</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-label">REMAINING</span>
+                <span class="stat-value" id="print-length" style="color: var(--accent);">--</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-label">COMPLETION</span>
+                <span class="stat-value" id="end-time" style="font-size: 1rem;">--:--</span>
             </div>
         </div>
 
-        <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.05);">
+        <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center;">
             <a href="/" style="color: #444; text-decoration: none; font-size: 0.7rem; font-family: 'JetBrains Mono'; transition: color 0.3s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='#444'">
                 <i class="fas fa-chevron-left"></i> RETURN_TO_HUB
             </a>
+            <span style="font-size: 0.6rem; color: #222; font-family: 'JetBrains Mono';">START: <span id="start-time">--:--</span></span>
         </div>
     </div>
 </div>
@@ -107,65 +114,74 @@
         "sensor.p2s_22e8aj5c1401485_print_progress": "print-progress",
         "sensor.p2s_22e8aj5c1401485_nozzle_temperature": "nozzle-temp",
         "sensor.p2s_22e8aj5c1401485_bed_temperature": "bed-temp",
+        "sensor.p2s_22e8aj5c1401485_chamber_temperature": "chamber-temp",
         "sensor.p2s_22e8aj5c1401485_current_layer": "current-layer",
         "sensor.p2s_22e8aj5c1401485_total_layer_count": "total-layers",
         "sensor.p2s_22e8aj5c1401485_current_stage": "current-stage",
-        "sensor.p2s_22e8aj5c1401485_print_length": "print-length"
+        "sensor.p2s_22e8aj5c1401485_print_length": "print-length",
+        "sensor.p2s_22e8aj5c1401485_print_weight": "print-weight",
+        "sensor.p2s_22e8aj5c1401485_start_time": "start-time",
+        "sensor.p2s_22e8aj5c1401485_end_time": "end-time"
     };
 
-    function formatTime(minutes) {
-        if (!minutes || isNaN(minutes) || minutes == 0) return "CALCULATING...";
+    function formatTime(val) {
+        const num = parseFloat(val);
+        if (isNaN(num) || num === 0) return "CALC...";
+        
+        // If the sensor returns hours instead of minutes, multiply by 60
+        // Adjust this if your HA sensor already provides minutes
+        const minutes = num; 
+        
         const h = Math.floor(minutes / 60);
-        const m = minutes % 60;
+        const m = (minutes % 60).toFixed(2); // Capped to 2 digits
         return h > 0 ? `${h}H ${m}M` : `${m}M`;
+    }
+
+    function parseTimestamp(ts) {
+        if (!ts || ts === "unknown") return "--:--";
+        const date = new Date(ts);
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
 
     async function updateDashboard() {
         try {
-            // Refresh Camera with Cache Buster
             document.getElementById('camera-stream').src = `${PROXY_URL}${CAMERA_ENTITY}?t=${Date.now()}`;
-
-            // Batch Fetch
-            const fetchPromises = Object.keys(SENSORS).map(id => 
-                fetch(PROXY_URL + id).then(res => res.json())
-            );
-            
-            const results = await Promise.all(fetchPromises);
+            const results = await Promise.all(Object.keys(SENSORS).map(id => fetch(PROXY_URL + id).then(res => res.json())));
 
             results.forEach((data, index) => {
                 const elementId = Object.values(SENSORS)[index];
                 let value = data.state;
 
                 if (elementId === 'print-progress') {
-                    const p = Math.round(value) || 0;
+                    const p = Math.round(parseFloat(value)) || 0;
                     document.getElementById(elementId).textContent = p;
                     document.getElementById('progress-fill').style.width = p + '%';
                 } 
                 else if (elementId === 'print-length') {
                     document.getElementById(elementId).textContent = formatTime(value);
                 }
+                else if (elementId === 'print-weight') {
+                    const w = parseFloat(value);
+                    document.getElementById(elementId).textContent = isNaN(w) ? "--" : w.toFixed(2);
+                }
+                else if (elementId === 'start-time' || elementId === 'end-time') {
+                    document.getElementById(elementId).textContent = parseTimestamp(value);
+                }
                 else if (elementId === 'current-stage') {
                     document.getElementById(elementId).textContent = value.toUpperCase().replace(/_/g, " ");
                 }
-                else if (elementId === 'nozzle-temp' || elementId === 'bed-temp') {
-                    document.getElementById(elementId).textContent = Math.round(value);
+                else if (elementId.includes('temp')) {
+                    document.getElementById(elementId).textContent = Math.round(parseFloat(value));
                 }
                 else {
                     document.getElementById(elementId).textContent = value || "--";
                 }
             });
 
-            // Update Sync Timestamp
-            const now = new Date();
-            document.getElementById('sync-time').textContent = `SYNC: ${now.toTimeString().split(' ')[0]}`;
-
-        } catch (e) {
-            console.error("Telemetry Sync Error:", e);
-            document.getElementById('sync-time').textContent = "SYNC: ERROR";
-        }
+            document.getElementById('sync-time').textContent = `SYNC: ${new Date().toLocaleTimeString([], {hour12:false})}`;
+        } catch (e) { console.error("Sync Error", e); }
     }
 
-    // High-frequency updates every 5 seconds
     setInterval(updateDashboard, 5000);
     updateDashboard();
 </script>
