@@ -12,25 +12,20 @@
             --text-main: #f1f5f9;
             --text-muted: #94a3b8;
             --border: #334155;
-            --success: #22c55e;
         }
 
         body {
             background-color: var(--bg);
             color: var(--text-main);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             margin: 0;
             padding: 20px;
             display: flex;
             justify-content: center;
         }
 
-        .dashboard {
-            width: 100%;
-            max-width: 1000px;
-        }
+        .dashboard { width: 100%; max-width: 1000px; }
 
-        /* Header */
         header {
             display: flex;
             justify-content: space-between;
@@ -40,7 +35,6 @@
             padding-bottom: 1rem;
         }
 
-        h1 { margin: 0; font-size: 1.8rem; letter-spacing: -1px; }
         h1 span { color: var(--accent); }
 
         .status-badge {
@@ -52,7 +46,6 @@
             text-transform: uppercase;
         }
 
-        /* Progress Section */
         .main-progress {
             background: var(--card-bg);
             padding: 2rem;
@@ -73,18 +66,16 @@
             height: 24px;
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
         }
 
         #progress-fill {
             height: 100%;
-            width: 0%; /* Dynamic */
+            width: 0%; 
             background: linear-gradient(90deg, #0ea5e9, #38bdf8);
-            box-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
-            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+            transition: width 1s ease-in-out;
         }
 
-        /* Grid Layout */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -98,14 +89,6 @@
             border: 1px solid var(--border);
         }
 
-        .card h3 {
-            margin-top: 0;
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
         .data-row {
             display: flex;
             justify-content: space-between;
@@ -113,10 +96,8 @@
             border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
-        .data-row:last-child { border: none; }
         .label { color: var(--text-muted); }
         .value { font-weight: 600; color: var(--accent); }
-
     </style>
 </head>
 <body>
@@ -124,80 +105,50 @@
     <div class="dashboard">
         <header>
             <h1>DootToot <span>Lab</span></h1>
-            <div id="print-status" class="status-badge">Detecting...</div>
+            <div id="print-status" class="status-badge">Checking...</div>
         </header>
 
         <section class="main-progress">
             <div class="progress-meta">
-                <span id="gcode-name">No active file</span>
+                <span id="gcode-name">Loading file...</span>
                 <span id="progress-percent">0%</span>
             </div>
             <div class="progress-bar-bg">
                 <div id="progress-fill"></div>
             </div>
             <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 15px;">
-                Layer: <span id="layer-count" class="value">0 / 0</span>
+                Layer: <span id="layer-count" class="value">-- / --</span>
             </p>
         </section>
 
         <div class="stats-grid">
             <div class="card">
                 <h3>Temperatures</h3>
-                <div class="data-row">
-                    <span class="label">Nozzle</span>
-                    <span id="nozzle-temp" class="value">--°C</span>
-                </div>
-                <div class="data-row">
-                    <span class="label">Heat Bed</span>
-                    <span id="bed-temp" class="value">--°C</span>
-                </div>
-                <div class="data-row">
-                    <span class="label">Chamber</span>
-                    <span id="chamber-temp" class="value">--°C</span>
-                </div>
+                <div class="data-row"><span class="label">Nozzle</span><span id="nozzle-temp" class="value">--°C</span></div>
+                <div class="data-row"><span class="label">Heat Bed</span><span id="bed-temp" class="value">--°C</span></div>
+                <div class="data-row"><span class="label">Chamber</span><span id="chamber-temp" class="value">--°C</span></div>
             </div>
 
             <div class="card">
                 <h3>Hardware</h3>
-                <div class="data-row">
-                    <span class="label">Cooling Fan</span>
-                    <span id="fan-speed" class="value">--%</span>
-                </div>
-                <div class="data-row">
-                    <span class="label">Nozzle Size</span>
-                    <span id="nozzle-size" class="value">0.4mm</span>
-                </div>
-                <div class="data-row">
-                    <span class="label">Speed Mode</span>
-                    <span id="speed-profile" class="value">Standard</span>
-                </div>
+                <div class="data-row"><span class="label">Cooling Fan</span><span id="fan-speed" class="value">--%</span></div>
+                <div class="data-row"><span class="label">Speed Mode</span><span id="speed-profile" class="value">Standard</span></div>
             </div>
 
             <div class="card">
                 <h3>Material Usage</h3>
-                <div class="data-row">
-                    <span class="label">Estimated Weight</span>
-                    <span id="print-weight" class="value">--g</span>
-                </div>
-                <div class="data-row">
-                    <span class="label">Filament Length</span>
-                    <span id="print-length" class="value">--m</span>
-                </div>
-                <div class="data-row">
-                    <span class="label">Remaining Time</span>
-                    <span id="time-left" class="value">--m</span>
-                </div>
+                <div class="data-row"><span class="label">Est. Weight</span><span id="print-weight" class="value">--g</span></div>
+                <div class="data-row"><span class="label">Remaining Time</span><span id="time-left" class="value">--m</span></div>
             </div>
         </div>
     </div>
 
     <script>
-        // REPLACE THESE WITH YOUR ACTUAL VALUES
-        const HA_BASE_URL = "https://ha.mandelli.dev/api/states/";
-        const ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI4YjFkZGNmM2Y1Y2U0MzRiOGU5MWVhNThjYmRhMzg5NiIsImlhdCI6MTc3Mzc5MDE1MywiZXhwIjoyMDg5MTUwMTUzfQ.3ppC-tPF_IPfPJKEunDJmO6r9H0beBQdc8Nbu3RdONc";
+        // Use your specific Cloudflare Worker URL here
+        const PROXY_URL = "https://doot-toot-proxy.mandellijason.workers.dev/";
 
         async function updateDashboard() {
-            // Map of HTML IDs to Home Assistant Entity IDs
+            // Mapping UI IDs to your specific Bambu P2S Serial Number sensors
             const entityMap = {
                 "progress-percent": "sensor.p2s_22e8aj5c1401485_print_progress",
                 "nozzle-temp": "sensor.p2s_22e8aj5c1401485_nozzle_temperature",
@@ -207,58 +158,46 @@
                 "gcode-name": "sensor.p2s_22e8aj5c1401485_gcode_filename",
                 "fan-speed": "sensor.p2s_22e8aj5c1401485_cooling_fan_speed",
                 "print-weight": "sensor.p2s_22e8aj5c1401485_print_weight",
-                "print-length": "sensor.p2s_22e8aj5c1401485_print_length",
                 "time-left": "sensor.p2s_22e8aj5c1401485_remaining_time"
             };
 
             for (const [elementId, entityId] of Object.entries(entityMap)) {
                 try {
-                    const response = await fetch(HA_BASE_URL + entityId, {
-                        headers: {
-                            "Authorization": `Bearer ${ACCESS_TOKEN}`,
-                            "Content-Type": "application/json"
-                        }
-                    });
-
+                    // No Authorization header needed here! The Worker handles it.
+                    const response = await fetch(PROXY_URL + entityId);
+                    
                     if (response.ok) {
                         const data = await response.json();
-                        const value = data.state;
-                        const element = document.getElementById(elementId);
+                        const val = data.state;
+                        const el = document.getElementById(elementId);
 
-                        // Special UI Updates
                         if (elementId === "progress-percent") {
-                            element.innerText = value + "%";
-                            document.getElementById('progress-fill').style.width = value + "%";
-                        } 
-                        else if (elementId === "gcode-name") {
-                            // Cleans up the long file path to just the filename
-                            element.innerText = value.split('/').pop() || "Idle";
-                        }
-                        else {
-                            element.innerText = value;
+                            el.innerText = val + "%";
+                            document.getElementById('progress-fill').style.width = val + "%";
+                        } else if (elementId === "gcode-name") {
+                            el.innerText = val.split('/').pop() || "Idle";
+                        } else {
+                            el.innerText = val;
                         }
 
-                        // Add units back to temps
-                        if (elementId.includes('temp')) element.innerText += "°C";
+                        if (elementId.includes('temp')) el.innerText += "°C";
                     }
                 } catch (err) {
-                    console.error("Error fetching " + entityId, err);
+                    console.error("Fetch failed for " + entityId, err);
                 }
             }
 
-            // Handle the Layer Count separately as it needs two sensors
+            // Layer count handles two sensors separately
             try {
-                const curRes = await fetch(HA_BASE_URL + "sensor.p2s_current_layer", { headers: {"Authorization": `Bearer ${ACCESS_TOKEN}`} });
-                const totRes = await fetch(HA_BASE_URL + "sensor.p2s_total_layer_count", { headers: {"Authorization": `Bearer ${ACCESS_TOKEN}`} });
-                const cur = await curRes.json();
-                const tot = await totRes.json();
+                const cur = await (await fetch(PROXY_URL + "sensor.p2s_22e8aj5c1401485_current_layer")).json();
+                const tot = await (await fetch(PROXY_URL + "sensor.p2s_22e8aj5c1401485_total_layer_count")).json();
                 document.getElementById('layer-count').innerText = `${cur.state} / ${tot.state}`;
             } catch (e) {}
         }
 
-        // Run every 20 seconds
-        setInterval(updateDashboard, 20000);
-        updateDashboard(); // Initial call
+        // Refresh data every 30 seconds
+        setInterval(updateDashboard, 30000);
+        updateDashboard();
     </script>
 </body>
 </html>
