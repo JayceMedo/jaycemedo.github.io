@@ -11,19 +11,10 @@
         :root { --accent: #38bdf8; --bg: #0a0a0a; --card-bg: #161616; }
         body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; margin: 0; padding: 20px; min-height: 100vh; display: flex; align-items: center; }
         
-        /* Bento Grid Setup */
-        .dashboard-container { 
-            max-width: 1200px; 
-            margin: 0 auto; 
-            display: grid; 
-            grid-template-columns: 1.5fr 1fr; 
-            gap: 20px; 
-            width: 100%;
-        }
-
+        .dashboard-container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; width: 100%; }
         .card { background: var(--card-bg); border-radius: 24px; padding: 24px; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; }
         
-        /* Left Side: Camera & Progress */
+        /* Left Side */
         .camera-box { position: relative; width: 100%; border-radius: 16px; overflow: hidden; background: #000; aspect-ratio: 16/9; margin-bottom: 20px; }
         #camera-stream { width: 100%; height: 100%; object-fit: cover; }
         
@@ -33,25 +24,25 @@
         .progress-bar-bg { width: 100%; height: 12px; background: rgba(255,255,255,0.05); border-radius: 6px; overflow: hidden; }
         #progress-fill { width: 0%; height: 100%; background: var(--accent); box-shadow: 0 0 15px rgba(56, 189, 248, 0.4); transition: width 1.5s ease; }
 
-        /* Right Side: Telemetry Grid */
+        /* Right Side Telemetry */
         .telemetry-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; flex-grow: 1; }
-        
         .stat-box { background: rgba(255,255,255,0.02); padding: 15px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); }
         .stat-label { display: block; font-size: 0.6rem; color: #666; font-family: 'JetBrains Mono'; margin-bottom: 4px; text-transform: uppercase; }
         .stat-value { font-size: 1.1rem; font-weight: 800; color: white; }
+        .stat-unit { font-size: 0.7rem; color: #444; margin-left: 2px; }
 
-        /* Combined Schedule Card */
+        /* Schedule Card */
         .schedule-card { grid-column: span 2; background: rgba(56, 189, 248, 0.05); border-color: rgba(56, 189, 248, 0.2); }
         .schedule-flex { display: flex; justify-content: space-between; align-items: center; margin-top: 5px; }
-        .schedule-item { flex: 1; }
-        .schedule-divider { width: 1px; height: 25px; background: rgba(255,255,255,0.1); margin: 0 15px; }
+        .schedule-item { flex: 1; text-align: center; }
+        .schedule-divider { width: 1px; height: 25px; background: rgba(255,255,255,0.1); margin: 0 10px; }
 
-        /* Currently Printing Image Card */
-        .cover-card { grid-column: span 2; padding: 0; overflow: hidden; position: relative; min-height: 150px; }
-        #cover-image { width: 100%; height: 100%; object-fit: cover; opacity: 0.7; }
-        .cover-label { position: absolute; top: 12px; left: 12px; background: rgba(0,0,0,0.8); padding: 4px 10px; border-radius: 6px; font-size: 0.6rem; font-family: 'JetBrains Mono'; color: var(--accent); }
+        /* Image Card */
+        .cover-card { grid-column: span 2; padding: 0; overflow: hidden; position: relative; min-height: 180px; background: #000; border-radius: 16px; }
+        #cover-image { width: 100%; height: 100%; object-fit: contain; background: #000; }
+        .cover-label { position: absolute; top: 12px; left: 12px; background: rgba(0,0,0,0.8); padding: 4px 10px; border-radius: 6px; font-size: 0.6rem; font-family: 'JetBrains Mono'; color: var(--accent); z-index: 2; }
 
-        .return-btn { margin-top: 20px; display: flex; align-items: center; gap: 8px; color: #444; text-decoration: none; font-size: 0.7rem; font-family: 'JetBrains Mono'; transition: 0.3s; }
+        .return-btn { margin-top: 20px; display: inline-flex; align-items: center; gap: 8px; color: #444; text-decoration: none; font-size: 0.7rem; font-family: 'JetBrains Mono'; transition: 0.3s; }
         .return-btn:hover { color: var(--accent); }
 
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
@@ -95,8 +86,16 @@
                 <span class="stat-value"><span id="nozzle-temp">--</span>° / <span id="bed-temp">--</span>°C</span>
             </div>
             <div class="stat-box">
+                <span class="stat-label">CHAMBER / WEIGHT</span>
+                <span class="stat-value"><span id="chamber-temp">--</span>°C / <span id="print-weight">--</span><span class="stat-unit">G</span></span>
+            </div>
+            <div class="stat-box">
                 <span class="stat-label">LAYERS</span>
                 <span class="stat-value"><span id="current-layer">--</span> / <span id="total-layers">--</span></span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-label">STATUS</span>
+                <span class="stat-value" id="current-stage-mini" style="font-size: 0.8rem;">--</span>
             </div>
 
             <div class="stat-box schedule-card">
@@ -104,17 +103,17 @@
                 <div class="schedule-flex">
                     <div class="schedule-item">
                         <span class="stat-label" style="font-size: 0.5rem;">STARTED</span>
-                        <span class="stat-value" id="start-time" style="font-size: 0.9rem;">--:--</span>
+                        <span class="stat-value" id="start-time" style="font-size: 0.8rem;">--:--</span>
                     </div>
                     <div class="schedule-divider"></div>
                     <div class="schedule-item">
                         <span class="stat-label" style="font-size: 0.5rem;">REMAINING</span>
-                        <span class="stat-value" id="print-length" style="color: var(--accent); font-size: 0.9rem;">--</span>
+                        <span class="stat-value" id="print-length" style="color: var(--accent); font-size: 0.8rem;">--</span>
                     </div>
                     <div class="schedule-divider"></div>
                     <div class="schedule-item">
                         <span class="stat-label" style="font-size: 0.5rem;">EST. END</span>
-                        <span class="stat-value" id="end-time" style="font-size: 0.9rem;">--:--</span>
+                        <span class="stat-value" id="end-time" style="font-size: 0.8rem;">--:--</span>
                     </div>
                 </div>
             </div>
@@ -132,18 +131,20 @@
 <script>
     const PROXY_URL = "https://api.mandelli.dev/";
     const CAMERA_ENTITY = "camera.p2s_22e8aj5c1401485_camera";
-    const COVER_IMAGE_ENTITY = "sensor.p2s_22e8aj5c1401485_cover_image";
     
     const SENSORS = {
         "sensor.p2s_22e8aj5c1401485_print_progress": "print-progress",
         "sensor.p2s_22e8aj5c1401485_nozzle_temperature": "nozzle-temp",
         "sensor.p2s_22e8aj5c1401485_bed_temperature": "bed-temp",
+        "sensor.p2s_22e8aj5c1401485_chamber_temperature": "chamber-temp",
         "sensor.p2s_22e8aj5c1401485_current_layer": "current-layer",
         "sensor.p2s_22e8aj5c1401485_total_layer_count": "total-layers",
         "sensor.p2s_22e8aj5c1401485_current_stage": "current-stage",
         "sensor.p2s_22e8aj5c1401485_print_length": "print-length",
+        "sensor.p2s_22e8aj5c1401485_print_weight": "print-weight",
         "sensor.p2s_22e8aj5c1401485_start_time": "start-time",
-        "sensor.p2s_22e8aj5c1401485_end_time": "end-time"
+        "sensor.p2s_22e8aj5c1401485_end_time": "end-time",
+        "sensor.p2s_22e8aj5c1401485_cover_image": "cover-image" // Fetched via attribute in loop
     };
 
     function formatTime(val) {
@@ -162,22 +163,23 @@
 
     async function updateDashboard() {
         try {
-            // Update Main Stream
+            // Update Camera Feed
             document.getElementById('camera-stream').src = `${PROXY_URL}${CAMERA_ENTITY}?t=${Date.now()}`;
             
-            // Update Cover Image
-            const coverRes = await fetch(PROXY_URL + COVER_IMAGE_ENTITY);
-            const coverData = await coverRes.json();
-            if (coverData.attributes && coverData.attributes.entity_picture) {
-                document.getElementById('cover-image').src = `https://ha.mandelli.dev${coverData.attributes.entity_picture}`;
-            }
-
-            // Update All Sensors
+            // Fetch all sensors
             const results = await Promise.all(Object.keys(SENSORS).map(id => fetch(PROXY_URL + id).then(res => res.json())));
 
             results.forEach((data, index) => {
                 const elementId = Object.values(SENSORS)[index];
                 let value = data.state;
+
+                // Handle Image Attribute specifically
+                if (elementId === 'cover-image') {
+                    if (data.attributes && data.attributes.entity_picture) {
+                        document.getElementById('cover-image').src = `https://ha.mandelli.dev${data.attributes.entity_picture}`;
+                    }
+                    return;
+                }
 
                 if (elementId === 'print-progress') {
                     const p = Math.round(parseFloat(value)) || 0;
@@ -187,17 +189,24 @@
                 else if (elementId === 'print-length') {
                     document.getElementById(elementId).textContent = formatTime(value);
                 }
+                else if (elementId === 'print-weight') {
+                    const w = parseFloat(value);
+                    document.getElementById(elementId).textContent = isNaN(w) ? "--" : w.toFixed(1);
+                }
                 else if (elementId === 'start-time' || elementId === 'end-time') {
                     document.getElementById(elementId).textContent = parseTimestamp(value);
                 }
                 else if (elementId === 'current-stage') {
-                    document.getElementById(elementId).textContent = value.toUpperCase().replace(/_/g, " ");
+                    const stage = value.toUpperCase().replace(/_/g, " ");
+                    document.getElementById(elementId).textContent = stage;
+                    document.getElementById('current-stage-mini').textContent = stage;
                 }
                 else if (elementId.includes('temp')) {
-                    document.getElementById(elementId).textContent = Math.round(parseFloat(value));
+                    document.getElementById(elementId).textContent = Math.round(parseFloat(value)) || "--";
                 }
                 else {
-                    document.getElementById(elementId).textContent = value || "--";
+                    const el = document.getElementById(elementId);
+                    if (el) el.textContent = value || "--";
                 }
             });
 
