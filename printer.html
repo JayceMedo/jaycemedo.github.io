@@ -186,7 +186,7 @@
             <div class="card">
                 <h3>Material Usage</h3>
                 <div class="data-row"><span class="label">Est. Weight</span><span id="print-weight" class="value">--g</span></div>
-                <div class="data-row"><span class="label">Remaining Time</span><span id="time-left" class="value">--m</span></div>
+                <div class="data-row"><span class="label">Remaining Time</span><span id="time-left" class="value">--</span></div>
             </div>
         </div>
     </div>
@@ -214,21 +214,44 @@
                     const response = await fetch(PROXY_URL + entityId);
                     if (response.ok) {
                         const data = await response.json();
-                        const val = data.state;
+                        let val = data.state;
                         const el = document.getElementById(elementId);
 
-                        if (elementId === "progress-percent") {
+                        // --- NEW FORMATTING LOGIC ---
+                        if (elementId === "time-left") {
+                            const totalMinutes = parseFloat(val) * 60;
+                            if (!isNaN(totalMinutes) && totalMinutes > 0) {
+                                const hours = Math.floor(totalMinutes / 60);
+                                const mins = Math.round(totalMinutes % 60);
+                                val = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
+                            } else {
+                                val = "0m";
+                            }
+                        } 
+                        else if (elementId === "progress-percent") {
                             el.innerText = val + "%";
                             document.getElementById('progress-fill').style.width = val + "%";
-                        } else if (elementId === "gcode-name") {
+                        } 
+                        else if (elementId === "gcode-name") {
                             el.innerText = val.split('/').pop() || "Idle";
-                        } else {
+                        } 
+                        else {
                             el.innerText = val;
                         }
-                        if (elementId.includes('temp')) el.innerText += "°C";
+
+                        // Add units back to temps
+                        if (elementId.includes('temp') && !isNaN(val)) el.innerText += "°C";
+                        // --- END FORMATTING LOGIC ---
                     }
                 } catch (err) { console.error("Fetch failed", err); }
             }
+
+            try {
+                const cur = await (await fetch(PROXY_URL + "sensor.p2s_22e8aj5c1401485_current_layer")).json();
+                const tot = await (await fetch(PROXY_URL + "sensor.p2s_22e8aj5c1401485_total_layer_count")).json();
+                document.getElementById('layer-count').innerText = `${cur.state} / ${tot.state}`;
+            } catch (e) {}
+        }
 
             try {
                 const cur = await (await fetch(PROXY_URL + "sensor.p2s_22e8aj5c1401485_current_layer")).json();
