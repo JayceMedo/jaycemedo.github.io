@@ -57,7 +57,6 @@
         100% { opacity: 1; transform: scale(1); }
     }
 
-    /* Status Bar Fade Animation */
     #live-status {
         transition: opacity 0.3s ease-in-out;
         opacity: 1;
@@ -67,7 +66,6 @@
         opacity: 0 !important;
     }
 
-    /* --- THE FIX FOR SYMMETRY --- */
     .btn-group {
         display: grid;
         grid-template-columns: 1fr 1fr; 
@@ -146,7 +144,7 @@
         border: none;
         border-left: 1px solid rgba(255, 255, 255, 0.1);
         gap: 8px;
-        border-radius: 0; /* Align with wrapper */
+        border-radius: 0;
     }
 
     .ping-btn:hover:not(:disabled) {
@@ -177,6 +175,24 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+    }
+
+    /* --- RESPONSIVE QUALITY OF LIFE FIX --- */
+    @media (max-width: 480px) {
+        .ping-input-wrapper {
+            flex-direction: column;
+            min-height: 88px;
+        }
+        #ping-message {
+            padding: 12px;
+            width: 100%;
+        }
+        .ping-btn {
+            border-left: none;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
+            height: 44px;
+        }
     }
 </style>
 </head>
@@ -285,31 +301,53 @@
             const customMessage = messageInput.value.trim();
 
             btn.disabled = true;
+            messageInput.disabled = true;
             icon.className = "fas fa-spinner fa-spin";
+
             try {
                 const res = await fetch(PROXY_URL + 'ping-me', { 
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message: customMessage })
                 });
+                
                 const data = await res.json();
+
                 if (res.ok) {
                     icon.className = "fas fa-check";
                     if(data.count) display.textContent = `[${data.count}]`;
-                    messageInput.value = ""; // Clear on success
-                } else if (res.status === 429) { 
-                    icon.className = "fas fa-clock"; 
+                    messageInput.value = ""; 
+                    startCooldown(120); 
+                } else if (res.status === 429) {
+                    icon.className = "fas fa-clock";
+                    startCooldown(60); 
                 }
             } catch (e) { 
-                icon.className = "fas fa-exclamation-triangle"; 
-            }
-            setTimeout(() => {
+                icon.className = "fas fa-exclamation-triangle";
                 btn.disabled = false;
-                icon.className = "fas fa-bell";
-            }, 5000);
+                messageInput.disabled = false;
+            }
         }
 
-        // Rest of your existing functions (checkMusicStatus, updateWeather, etc.) unchanged
+        function startCooldown(seconds) {
+            const btn = document.getElementById('ping-btn');
+            const messageInput = document.getElementById('ping-message');
+            let remaining = seconds;
+
+            const interval = setInterval(() => {
+                remaining--;
+                if (remaining <= 0) {
+                    clearInterval(interval);
+                    btn.disabled = false;
+                    messageInput.disabled = false;
+                    // Restore original bell icon and display
+                    btn.innerHTML = `<i class="fas fa-bell" id="ping-icon"></i> <span class="ping-count" id="ping-display">${document.getElementById('ping-display').textContent}</span>`;
+                } else {
+                    btn.innerHTML = `<i class="fas fa-clock"></i> ${remaining}s`;
+                }
+            }, 1000);
+        }
+
         async function checkMusicStatus() {
             const API_KEY = '452d1e53691b35628314664820db7e1a';
             const USERNAME = 'jasonmandelli';
