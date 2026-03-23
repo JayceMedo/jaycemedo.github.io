@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>System Admin | Mandelli.dev</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-box { max-width: 600px; margin: 50px auto; padding: 20px; font-family: 'JetBrains Mono', monospace; }
+        .pass-input { background: #111; border: 1px solid #333; color: #38bdf8; padding: 10px; width: 100%; margin-bottom: 20px; }
+        .admin-item { 
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px; border-bottom: 1px solid #222; font-size: 0.8rem;
+        }
+        .del-btn { background: #ef4444; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 4px; }
+        .del-btn:hover { background: #b91c1c; }
+    </style>
+</head>
+<body style="background: #050505; color: white;">
+    <div class="admin-box">
+        <h2>ADMIN_CONTROL_PANEL</h2>
+        <input type="password" id="admin-password" class="pass-input" placeholder="ENTER_ADMIN_KEY...">
+        <button onclick="loadAdminLogs()" class="btn" style="width:100%; margin-bottom: 20px;">SYNC_LOGS</button>
+        
+        <div id="admin-log-list"></div>
+    </div>
+
+    <script>
+        const PROXY_URL = "https://api.mandelli.dev/";
+
+        async function loadAdminLogs() {
+            const listEl = document.getElementById('admin-log-list');
+            const res = await fetch(PROXY_URL + 'get-messages');
+            const messages = await res.json();
+            
+            listEl.innerHTML = messages.map(m => `
+                <div class="admin-item">
+                    <span>[${m.id}] ${m.message.substring(0, 20)}...</span>
+                    <button class="del-btn" onclick="deleteMsg('${m.kv_key}')">DELETE</button>
+                </div>
+            `).join('');
+        }
+
+        async function deleteMsg(kvKey) {
+            if (!confirm("Confirm permanent deletion of " + kvKey + "?")) return;
+            
+            const pass = document.getElementById('admin-password').value;
+            const res = await fetch(PROXY_URL + 'delete-message', {
+                method: 'DELETE',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'x-admin-key': pass 
+                },
+                body: JSON.stringify({ key: kvKey })
+            });
+
+            if (res.ok) {
+                alert("ENTRY_PURGED");
+                loadAdminLogs();
+            } else {
+                alert("ACCESS_DENIED: INVALID_KEY");
+            }
+        }
+    </script>
+</body>
+</html>
