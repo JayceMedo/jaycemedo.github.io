@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mandelli.dev | Guestbook</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        .guestbook-container {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            margin-bottom: 30px;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover { color: #ffffff; }
+
+        .log-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .log-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .log-entry {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            animation: slideIn 0.3s ease forwards;
+        }
+
+        .log-meta {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            color: #38bdf8;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .log-text {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.5;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Loading Spinner */
+        .loader {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.3);
+            font-family: 'JetBrains Mono', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="guestbook-container">
+        <a href="/" class="back-link"><i class="fas fa-arrow-left"></i> RETURN_TO_HUB</a>
+        
+        <header class="log-header">
+            <h1>GUESTBOOK<span class="dot">.</span>LOG</h1>
+            <p class="tagline">// Public archive of system pings</p>
+        </header>
+
+        <div id="log-list" class="log-container">
+            <div class="loader"><i class="fas fa-spinner fa-spin"></i> ACCESSING_ARCHIVE...</div>
+        </div>
+    </div>
+
+    <script>
+        const PROXY_URL = "https://api.mandelli.dev/";
+
+        async function loadLogs() {
+            const listEl = document.getElementById('log-list');
+            try {
+                const res = await fetch(PROXY_URL + 'get-messages');
+                const data = await res.json(); // Data should be [{time: "...", msg: "..."}]
+
+                if (data.length === 0) {
+                    listEl.innerHTML = '<div class="loader">Archive is empty.</div>';
+                    return;
+                }
+
+                listEl.innerHTML = data.map(entry => `
+                    <div class="log-entry">
+                        <div class="log-meta">
+                            <span>ENTRY_ID: ${entry.id}</span>
+                            <span>${entry.date}</span>
+                        </div>
+                        <div class="log-text">${entry.message}</div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                listEl.innerHTML = '<div class="loader" style="color: #ef4444;">ERROR: FAILED_TO_LOAD_ARCHIVE</div>';
+            }
+        }
+
+        loadLogs();
+    </script>
+</body>
+</html>
