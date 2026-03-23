@@ -78,6 +78,37 @@
         align-items: stretch;
     }
 
+    /* Custom Ping Container */
+    .ping-input-wrapper {
+        display: flex;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        overflow: hidden;
+        transition: all 0.2s ease;
+    }
+
+    .ping-input-wrapper:focus-within {
+        border-color: rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    #ping-message {
+        background: transparent;
+        border: none;
+        color: white;
+        padding: 0 12px;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.8rem;
+        flex-grow: 1;
+        outline: none;
+        min-width: 0;
+    }
+
+    #ping-message::placeholder {
+        color: rgba(255, 255, 255, 0.3);
+    }
+
     .btn, .ping-btn {
         appearance: none;
         -webkit-appearance: none;
@@ -110,15 +141,16 @@
     }
 
     .ping-btn {
-        background: rgba(255, 255, 255, 0.05);
+        background: rgba(255, 255, 255, 0.1);
         color: #ffffff;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: none;
+        border-left: 1px solid rgba(255, 255, 255, 0.1);
         gap: 8px;
+        border-radius: 0; /* Align with wrapper */
     }
 
     .ping-btn:hover:not(:disabled) {
-        background: rgba(255, 255, 255, 0.1);
-        border-color: rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.2);
     }
 
     .ping-btn:disabled {
@@ -139,7 +171,6 @@
         height: 100%;
     }
 
-    /* Formatting for the commit message in footer */
     #last-updated {
         display: block;
         max-width: 250px;
@@ -177,11 +208,13 @@
                 
                 <div class="btn-group">
                     <a href="/jason" class="btn">View Jason &rarr;</a>
-                    <button id="ping-btn" class="ping-btn" onclick="triggerPing()">
-                        <i class="fas fa-bell" id="ping-icon"></i> 
-                        <span>Ping Me</span>
-                        <span class="ping-count" id="ping-display">[--]</span>
-                    </button>
+                    <div class="ping-input-wrapper">
+                        <input type="text" id="ping-message" placeholder="Say hi..." maxlength="100">
+                        <button id="ping-btn" class="ping-btn" onclick="triggerPing()">
+                            <i class="fas fa-bell" id="ping-icon"></i> 
+                            <span class="ping-count" id="ping-display">[--]</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </section>
@@ -248,22 +281,35 @@
             const btn = document.getElementById('ping-btn');
             const icon = document.getElementById('ping-icon');
             const display = document.getElementById('ping-display');
+            const messageInput = document.getElementById('ping-message');
+            const customMessage = messageInput.value.trim();
+
             btn.disabled = true;
             icon.className = "fas fa-spinner fa-spin";
             try {
-                const res = await fetch(PROXY_URL + 'ping-me', { method: 'POST' });
+                const res = await fetch(PROXY_URL + 'ping-me', { 
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: customMessage })
+                });
                 const data = await res.json();
                 if (res.ok) {
                     icon.className = "fas fa-check";
                     if(data.count) display.textContent = `[${data.count}]`;
-                } else if (res.status === 429) { icon.className = "fas fa-clock"; }
-            } catch (e) { icon.className = "fas fa-exclamation-triangle"; }
+                    messageInput.value = ""; // Clear on success
+                } else if (res.status === 429) { 
+                    icon.className = "fas fa-clock"; 
+                }
+            } catch (e) { 
+                icon.className = "fas fa-exclamation-triangle"; 
+            }
             setTimeout(() => {
                 btn.disabled = false;
                 icon.className = "fas fa-bell";
             }, 5000);
         }
 
+        // Rest of your existing functions (checkMusicStatus, updateWeather, etc.) unchanged
         async function checkMusicStatus() {
             const API_KEY = '452d1e53691b35628314664820db7e1a';
             const USERNAME = 'jasonmandelli';
@@ -321,12 +367,9 @@
                 const res = await fetch('https://api.github.com/repos/jaycemedo/jaycemedo.github.io/commits/main');
                 if (!res.ok) throw new Error();
                 const data = await res.json();
-                
                 const date = new Date(data.commit.author.date);
-                const message = data.commit.message.split('\n')[0]; // Get only the first line of the commit
+                const message = data.commit.message.split('\n')[0];
                 const formattedDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                
-                // Show "Date: Message" in the footer
                 document.getElementById('last-updated').textContent = `Last update: ${formattedDate} (${message})`;
                 apiStatus.github = true;
             } catch (e) { 
@@ -338,12 +381,10 @@
         function updateStatusDisplay() {
             const statusEl = document.getElementById('live-status');
             statusEl.classList.add('status-fade-out');
-
             setTimeout(() => {
                 const online = Object.values(apiStatus).filter(Boolean).length;
                 const total = Object.keys(apiStatus).length;
                 const isAllOnline = online === total;
-
                 const messages = [
                     { text: isAllOnline ? 'All systems operational' : `${online}/${total} APIs online`, icon: isAllOnline ? '✓' : '✕' },
                     { text: `Weather API: ${apiStatus.weather ? 'Online' : 'Offline'}`, icon: apiStatus.weather ? '✓' : '✕' },
@@ -352,7 +393,6 @@
                     { text: `Printer API: ${apiStatus.printer ? 'Online' : 'Offline'}`, icon: apiStatus.printer ? '✓' : '✕' },
                     { text: `Ping API: ${apiStatus.ping ? 'Online' : 'Offline'}`, icon: apiStatus.ping ? '✓' : '✕' }
                 ];
-
                 const current = messages[statusCycleIndex % messages.length];
                 const color = current.icon === '✓' ? 'color: #10b981;' : 'color: #ef4444;';
                 statusEl.innerHTML = `<span style="${color}font-weight: bold;">${current.icon}</span> ${current.text}`;
