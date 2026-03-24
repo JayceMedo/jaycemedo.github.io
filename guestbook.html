@@ -111,7 +111,7 @@
                     <div class="log-entry">
                         <div class="log-meta">
                             <span>ENTRY_ID: ${entry.id}</span>
-                            <span>${entry.date}</span>
+                            <span>${new Date(entry.date).toLocaleString()}</span>
                         </div>
                         <div class="log-text">${entry.message}</div>
                     </div>
