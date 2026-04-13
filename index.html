@@ -219,6 +219,17 @@
             height: 44px;
         }
     }
+    /* Badge Link Wrapper */
+    .badge-link {
+    text-decoration: none;
+    display: contents; /* Keeps the flex layout of the container intact */
+    }
+
+    .badge-link:hover .live-badge {
+    filter: brightness(1.2);
+    transform: translateY(-1px);
+    cursor: pointer;
+    }
 </style>
 </head>
 <body>
@@ -234,14 +245,19 @@
                 <span class="label">IT Professional</span>
                 
                 <div class="badge-container">
+                    <a href="https://www.last.fm/user/jasonmandelli" target="_blank" class="badge-link">
                     <div class="live-badge music-badge" id="music-badge" style="display: none;">
                         <span class="pulse"></span>
                         <span class="badge-text"><i class="fas fa-headphones"></i> LISTENING</span>
                     </div>
+                    </a>
+
+                    <a href="/printer" class="badge-link">
                     <div class="live-badge printer-badge" id="printer-badge" style="display: none;">
                         <span class="pulse-blue"></span>
                         <span class="badge-text"><i class="fas fa-print"></i> PRINTING</span>
                     </div>
+                    </a>
                 </div>
 
                 <h2>Jason Mandelli</h2>
