@@ -233,8 +233,22 @@
 </style>
 </head>
 <body>
-
     <main class="bento-container">
+        <div class="grid-item custom-banner">
+            <div class="banner-content">
+                <i class="fab fa-android"></i>
+                <span>
+                    Android will become a locked-down platform in: 
+                    <b>
+                <span id="days">--</span>d 
+                <span id="hours">--</span>h 
+                <span id="minutes">--</span>m 
+                <span id="seconds">--</span>s
+                </b>
+                </span>
+        <a href="https://keepandroidopen.org" target="_blank" class="banner-link">Learn More &rarr;</a>
+            </div>
+        </div>
         <header class="grid-item header">
             <h1>MANDELLI<span class="dot">.</span>DEV</h1>
             <p class="tagline">// Engineering the Future of IT & Software</p>
@@ -483,7 +497,36 @@
                 statusEl.classList.remove('status-fade-out');
             }, 300);
         }
+        function updateCountdown() {
+            const targetDate = new Date('September 1, 2026 00:00:00').getTime();
+    
+            // We wrap the logic in a function we can call every second
+            const timer = setInterval(function() {
+            const now = new Date().getTime();
+            const diff = targetDate - now;
 
+            if (diff <= 0) {
+                clearInterval(timer);
+                document.querySelector('.banner-content span').textContent = "The target date has arrived.";
+            return;
+        }
+
+            // Time calculations
+            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+            // Inject into HTML
+            document.getElementById('days').textContent = d;
+            document.getElementById('hours').textContent = h;
+            document.getElementById('minutes').textContent = m;
+            document.getElementById('seconds').textContent = s;
+                }, 1000);
+        }
+
+        // Start the timer
+        updateCountdown();
         function startCycles() {
             updateWeather();
             updateLastUpdated();
