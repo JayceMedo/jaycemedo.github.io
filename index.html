@@ -177,30 +177,30 @@
         text-overflow: ellipsis;
     }
     .guestbook-link-container {
-    margin-top: 12px;
-    text-align: right; 
+        margin-top: 12px;
+        text-align: right; 
     }
 
     .guestbook-link {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.65rem;
-    color: rgba(255, 255, 255, 0.3);
-    text-decoration: none;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    transition: all 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.65rem;
+        color: rgba(255, 255, 255, 0.3);
+        text-decoration: none;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
     }
 
     .guestbook-link:hover {
-    color: #38bdf8; 
-    transform: translateX(-2px);
+        color: #38bdf8; 
+        transform: translateX(-2px);
     }
 
     .guestbook-link i {
-    font-size: 0.75rem;
+        font-size: 0.75rem;
     }
 
     @media (max-width: 480px) {
@@ -219,21 +219,24 @@
             height: 44px;
         }
     }
+
     /* Badge Link Wrapper */
     .badge-link {
-    text-decoration: none;
-    display: contents; 
+        text-decoration: none;
+        display: contents; 
     }
 
     .badge-link:hover .live-badge {
-    filter: brightness(1.2);
-    transform: translateY(-1px);
-    cursor: pointer;
+        filter: brightness(1.2);
+        transform: translateY(-1px);
+        cursor: pointer;
     }
 </style>
 </head>
 <body>
-    <script src="https://keepandroidopen.org/banner.js"></script>
+    <div id="banner-wrapper" style="width: 100%; position: relative; z-index: 9999;">
+        <script src="https://keepandroidopen.org/banner.js"></script>
+    </div>
 
     <main class="bento-container">
         <header class="grid-item header">
