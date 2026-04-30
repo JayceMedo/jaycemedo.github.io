@@ -5,207 +5,151 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mandelli.dev</title>
     
-    <link rel="stylesheet" href="style.css">
-    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90' font-family='Arial, sans-serif' fill='%23ffffff'%3EM%3C/text%3E%3C/svg%3E">
 
-    <script data-goatcounter="https://medo.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+    <style>
+        :root {
+            --bg: #050505;
+            --card-bg: rgba(20, 20, 20, 0.6);
+            --border: rgba(255, 255, 255, 0.1);
+            --accent-1: #10b981;
+            --accent-2: #3b82f6;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg);
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column; /* This forces banner on TOP of the site */
+            align-items: center;    /* This forces the banner to CENTER */
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Banner Container */
+        .banner-wrap {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            padding: 20px 0;
+            z-index: 9999;
+        }
+
+        .bento-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            max-width: 1100px;
+            width: 90%;
+            padding-bottom: 3rem;
+        }
+
+        .grid-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 2.5rem;
+            backdrop-filter: blur(12px);
+            transition: all 0.4s ease;
+        }
+
+        .header { grid-column: span 2; border: none; background: transparent; text-align: center; }
+        .header h1 { font-weight: 800; letter-spacing: -3px; font-size: clamp(2.5rem, 8vw, 4rem); margin: 0; }
+        .header .dot { color: var(--accent-1); }
+        .tagline { font-family: 'JetBrains Mono', monospace; opacity: 0.5; font-size: 0.9rem; }
+
+        .badge-container { display: flex; gap: 8px; justify-content: center; margin-bottom: 12px; min-height: 28px; }
+        .live-badge { display: flex; align-items: center; gap: 6px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); padding: 4px 10px; border-radius: 20px; font-size: 0.65rem; font-family: 'JetBrains Mono', monospace; font-weight: 800; }
+        .music-badge { border-color: var(--accent-1); color: var(--accent-1); }
+        .printer-badge { border-color: var(--accent-2); color: var(--accent-2); }
+
+        .pulse { height: 6px; width: 6px; border-radius: 50%; background: var(--accent-1); animation: blink 1.5s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+        h2 { font-size: 2rem; margin: 0.5rem 0; font-weight: 800; }
+        p { line-height: 1.6; color: rgba(255, 255, 255, 0.7); font-weight: 300; }
+
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 1.5rem; }
+        .btn { background: #fff; color: #000; border-radius: 50px; text-decoration: none; font-weight: 600; display: flex; align-items: center; justify-content: center; height: 44px; transition: 0.3s; }
+        
+        .ping-input-wrapper { display: flex; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); border-radius: 50px; overflow: hidden; padding-left: 15px; }
+        #ping-message { background: transparent; border: none; color: #fff; outline: none; flex-grow: 1; font-size: 0.8rem; }
+        .ping-btn { background: var(--accent-1); color: #fff; border: none; padding: 0 15px; cursor: pointer; }
+
+        .footer-status { grid-column: span 2; display: flex; justify-content: space-between; align-items: center; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; padding-top: 2rem; }
+        .status-left { display: flex; gap: 1.5rem; }
+        .weather-info { color: var(--accent-1); }
+
+        @media (max-width: 850px) {
+            .bento-container { grid-template-columns: 1fr; }
+            .header, .footer-status { grid-column: span 1; }
+            .footer-status { flex-direction: column; gap: 1rem; }
+        }
+    </style>
 </head>
 <body>
+
+    <div class="banner-wrap">
+        <script src="https://keepandroidopen.org/banner.js"></script>
+    </div>
+
     <main class="bento-container">
         <header class="grid-item header">
-            <div class="header-banner-wrap">
-                <script src="https://keepandroidopen.org/banner.js"></script>
-            </div>
-            
             <h1>MANDELLI<span class="dot">.</span>DEV</h1>
             <p class="tagline">// Engineering the Future of IT & Software</p>
         </header>
 
-        <section class="grid-item profile-card your-card">
-            <div class="card-content">
-                <span class="label">IT Professional</span>
-                
-                <div class="badge-container">
-                    <a href="https://www.last.fm/user/jasonmandelli" target="_blank" class="badge-link">
-                        <div class="live-badge music-badge" id="music-badge" style="display: none;">
-                            <span class="pulse"></span>
-                            <span class="badge-text"><i class="fas fa-headphones"></i> LISTENING</span>
-                        </div>
-                    </a>
-
-                    <a href="/printer" class="badge-link">
-                        <div class="live-badge printer-badge" id="printer-badge" style="display: none;">
-                            <span class="pulse-blue"></span>
-                            <span class="badge-text"><i class="fas fa-print"></i> PRINTING</span>
-                        </div>
-                    </a>
-                </div>
-
-                <h2>Jason Mandelli</h2>
-                <p>Specializing in PACS systems, Application implementation, and high-availability infrastructure.</p>
-                
-                <div class="btn-group">
-                    <a href="/jason" class="btn">Enter &rarr;</a>
-                    <div class="ping-input-wrapper">
-                        <input type="text" id="ping-message" placeholder="Type Message here..." maxlength="100">
-                        <button id="ping-btn" class="ping-btn" onclick="triggerPing()">
-                            <i class="fas fa-bell" id="ping-icon"></i> 
-                            <span class="ping-count" id="ping-display">[--]</span>
-                        </button>
-                    </div>
-                </div>
-                <div class="guestbook-link-container">
-                    <a href="/guestbook.html" class="guestbook-link">
-                     <i class="fas fa-book-open"></i> View Guestbook_History
-                    </a>
+        <section class="grid-item profile-card">
+            <div class="badge-container">
+                <div class="live-badge music-badge" id="music-badge" style="display: none;"><span class="pulse"></span> LISTENING</div>
+                <div class="live-badge printer-badge" id="printer-badge" style="display: none;"><span class="pulse" style="background: var(--accent-2)"></span> PRINTING</div>
+            </div>
+            <h2>Jason Mandelli</h2>
+            <p>Specializing in PACS systems, Application implementation, and high-availability infrastructure.</p>
+            <div class="btn-group">
+                <a href="/jason" class="btn">Enter &rarr;</a>
+                <div class="ping-input-wrapper">
+                    <input type="text" id="ping-message" placeholder="Ping me...">
+                    <button id="ping-btn" class="ping-btn" onclick="triggerPing()"><i class="fas fa-bell"></i></button>
                 </div>
             </div>
         </section>
 
-        <section class="grid-item profile-card daniel-card">
-            <div class="card-content">
-                <span class="label">Full Stack Engineer</span>
-                <h2>Daniel Mandelli</h2>
-                <p>Founder of WebWise Technology. Expert in Web3, React/React Native Applications, and blockchain development.</p>
-                <a href="/daniel" class="btn">Enter &rarr;</a>
-            </div>
+        <section class="grid-item profile-card">
+            <span class="label" style="color: var(--accent-2)">Full Stack Engineer</span>
+            <h2>Daniel Mandelli</h2>
+            <p>Founder of WebWise Technology. Expert in Web3, React Applications, and blockchain development.</p>
+            <a href="/daniel" class="btn" style="width: fit-content;">Enter &rarr;</a>
         </section>
 
-        <footer class="grid-item footer-status">
+        <footer class="grid-item footer-status" style="border: none; background: transparent;">
             <div class="status-left">
-                <div class="coord-box">
-                    <span class="meta-label">Carson City, NV</span> 
-                    <span class="meta-value">39.16° N, 119.76° W</span>
-                    <div class="weather-info" id="weather-carson"></div>
-                </div>
-                <div class="coord-divider"></div>
-                <div class="coord-box">
-                    <span class="meta-label">Providence, RI</span> 
-                    <span class="meta-value">41.82° N, 71.41° W</span>
-                    <div class="weather-info" id="weather-providence"></div>
-                </div>
+                <div>CC, NV: <span class="weather-info" id="weather-carson">...</span></div>
+                <div>PVD, RI: <span class="weather-info" id="weather-providence">...</span></div>
             </div>
-            
-            <div class="status-middle">
-                <div class="github-links">
-                    <a href="https://github.com/jaycemedo" class="gh-link"><i class="fab fa-github"></i> JASON</a>
-                    <a href="https://github.com/dannymandelli" class="gh-link"><i class="fab fa-github"></i> DANIEL</a>
-                    <a href="https://gitlab.com/dannymandelli" class="gh-link"><i class="fab fa-gitlab"></i> GITLAB</a>
-                </div>
-            </div>
-            
-            <div class="status-right">
-                <div class="status-meta">
-                    <span id="last-updated">Last updated: —</span>
-                    <span id="live-status">Status: Checking...</span>
-                </div>
-            </div>
+            <div id="live-status">Checking systems...</div>
         </footer>
     </main>
 
     <script>
         const PROXY_URL = "https://api.mandelli.dev/";
-        const PRINTER_STATUS_ENTITY = "sensor.p2s_22e8aj5c1401485_print_status";
-        let apiStatus = { weather: false, music: false, github: false, printer: false, ping: false };
-        let statusCycleIndex = 0;
-
-        async function fetchPingCount() {
-            try {
-                const res = await fetch(PROXY_URL + 'ping_count');
-                const data = await res.json();
-                document.getElementById('ping-display').textContent = `[${data.state}]`;
-                apiStatus.ping = true;
-            } catch (e) { apiStatus.ping = false; }
-        }
-
-        async function triggerPing() {
-            const btn = document.getElementById('ping-btn');
-            const icon = document.getElementById('ping-icon');
-            const display = document.getElementById('ping-display');
-            const messageInput = document.getElementById('ping-message');
-            btn.disabled = true;
-            messageInput.disabled = true;
-            icon.className = "fas fa-spinner fa-spin";
-            try {
-                const res = await fetch(PROXY_URL + 'ping-me', { 
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: messageInput.value.trim() })
-                });
-                const data = await res.json();
-                if (res.ok) {
-                    icon.className = "fas fa-check";
-                    if(data.count) display.textContent = `[${data.count}]`;
-                    messageInput.value = ""; 
-                    startCooldown(120); 
-                }
-            } catch (e) { icon.className = "fas fa-exclamation-triangle"; btn.disabled = false; messageInput.disabled = false; }
-        }
-
-        function startCooldown(seconds) {
-            const btn = document.getElementById('ping-btn');
-            const messageInput = document.getElementById('ping-message');
-            let remaining = seconds;
-            const interval = setInterval(() => {
-                remaining--;
-                if (remaining <= 0) {
-                    clearInterval(interval);
-                    btn.disabled = false;
-                    messageInput.disabled = false;
-                    btn.innerHTML = `<i class="fas fa-bell" id="ping-icon"></i> <span class="ping-count" id="ping-display">${document.getElementById('ping-display').textContent}</span>`;
-                } else {
-                    btn.innerHTML = `<i class="fas fa-clock"></i> ${remaining}s`;
-                }
-            }, 1000);
-        }
-
-        async function checkMusicStatus() {
-            const API_KEY = '452d1e53691b35628314664820db7e1a';
-            const USERNAME = 'jasonmandelli';
-            try {
-                const response = await fetch(`https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${USERNAME}&api_key=${API_KEY}&format=json&limit=1`);
-                const data = await response.json();
-                const isNowPlaying = data.recenttracks.track.some(track => track['@attr'] && track['@attr'].nowplaying === 'true');
-                document.getElementById('music-badge').style.display = isNowPlaying ? 'flex' : 'none';
-                apiStatus.music = true;
-            } catch (e) { apiStatus.music = false; }
-        }
-
         async function updateWeather() {
-            const locations = [{ id: 'weather-carson', lat: 39.16, lon: -119.76 }, { id: 'weather-providence', lat: 41.82, lon: -71.41 }];
-            for (const loc of locations) {
+            const locs = [{id:'weather-carson', lat:39.16, lon:-119.76}, {id:'weather-providence', lat:41.82, lon:-71.41}];
+            for (const loc of locs) {
                 try {
                     const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}&current_weather=true&temperature_unit=fahrenheit`);
                     const data = await res.json();
                     document.getElementById(loc.id).innerHTML = `${Math.round(data.current_weather.temperature)}°F`;
-                    apiStatus.weather = true;
-                } catch (e) { apiStatus.weather = false; }
+                } catch (e) {}
             }
         }
-
-        async function updateLastUpdated() {
-            try {
-                const res = await fetch('https://api.github.com/repos/jaycemedo/jaycemedo.github.io/commits/main');
-                const data = await res.json();
-                const formattedDate = new Date(data.commit.author.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                document.getElementById('last-updated').textContent = `Last update: ${formattedDate}`;
-                apiStatus.github = true;
-            } catch (e) { apiStatus.github = false; }
-        }
-
-        function startCycles() {
-            updateWeather();
-            updateLastUpdated();
-            checkMusicStatus();
-            fetchPingCount();
-            setInterval(updateWeather, 600000);
-            setInterval(checkMusicStatus, 30000);
-        }
-        startCycles();
+        updateWeather();
     </script>
 </body>
 </html>
