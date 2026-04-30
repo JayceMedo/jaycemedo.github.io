@@ -27,21 +27,13 @@
         <section class="grid-item profile-card your-card">
             <div class="card-content">
                 <span class="label">IT Professional</span>
-                
                 <div class="badge-container">
-                    <a href="https://www.last.fm/user/jasonmandelli" target="_blank" class="badge-link">
-                        <div class="live-badge music-badge" id="music-badge" style="display: none;">
-                            <span class="pulse"></span>
-                            <span class="badge-text"><i class="fas fa-headphones"></i> LISTENING</span>
-                        </div>
-                    </a>
-
-                    <a href="/printer" class="badge-link">
-                        <div class="live-badge printer-badge" id="printer-badge" style="display: none;">
-                            <span class="pulse-blue"></span>
-                            <span class="badge-text"><i class="fas fa-print"></i> PRINTING</span>
-                        </div>
-                    </a>
+                    <div class="live-badge music-badge" id="music-badge" style="display: none;">
+                        <span class="pulse"></span> <span class="badge-text">LISTENING</span>
+                    </div>
+                    <div class="live-badge printer-badge" id="printer-badge" style="display: none;">
+                        <span class="pulse-blue"></span> <span class="badge-text">PRINTING</span>
+                    </div>
                 </div>
 
                 <h2>Jason Mandelli</h2>
@@ -54,15 +46,13 @@
                             <input type="text" id="ping-message" placeholder="Ping me..." maxlength="100">
                             <button id="ping-btn" class="ping-btn" onclick="triggerPing()">
                                 <i class="fas fa-bell" id="ping-icon"></i> 
-                                <span class="ping-count" id="ping-display">[--]</span>
+                                <span id="ping-display">[--]</span>
                             </button>
                         </div>
                     </div>
-                    <div class="guestbook-link-container">
-                        <a href="/guestbook.html" class="guestbook-link">
-                         <i class="fas fa-book-open"></i> View Guestbook History
-                        </a>
-                    </div>
+                    <a href="/guestbook.html" class="guestbook-link">
+                        <i class="fas fa-book-open"></i> View Guestbook History
+                    </a>
                 </div>
             </div>
         </section>
@@ -71,7 +61,7 @@
             <div class="card-content">
                 <span class="label">Full Stack Engineer</span>
                 <h2>Daniel Mandelli</h2>
-                <p>Founder of WebWise Technology. Expert in Web3, React/React Native Applications, and blockchain development.</p>
+                <p>Founder of WebWise Technology. Expert in Web3, React Applications, and blockchain development.</p>
                 <div class="action-stack">
                     <a href="/daniel" class="btn">Enter &rarr;</a>
                 </div>
@@ -82,25 +72,23 @@
             <div class="status-left">
                 <div class="coord-box">
                     <span class="meta-label">Carson City, NV</span> 
-                    <div class="weather-info" id="weather-carson"></div>
+                    <span class="meta-value">39.16° N, 119.76° W</span>
+                    <div class="weather-info" id="weather-carson">...</div>
                 </div>
                 <div class="coord-divider"></div>
                 <div class="coord-box">
                     <span class="meta-label">Providence, RI</span> 
-                    <div class="weather-info" id="weather-providence"></div>
-                </div>
-            </div>
-            
-            <div class="status-middle">
-                <div class="github-links">
-                    <a href="https://github.com/jaycemedo" class="gh-link"><i class="fab fa-github"></i> JASON</a>
-                    <a href="https://github.com/dannymandelli" class="gh-link"><i class="fab fa-github"></i> DANIEL</a>
+                    <span class="meta-value">41.82° N, 71.41° W</span>
+                    <div class="weather-info" id="weather-providence">...</div>
                 </div>
             </div>
             
             <div class="status-right">
+                <div class="github-links">
+                    <a href="https://github.com/jaycemedo" class="gh-link"><i class="fab fa-github"></i> GITHUB</a>
+                </div>
                 <div class="status-meta">
-                    <span id="last-updated">Last updated: —</span>
+                    <span id="last-updated">Last update: --</span>
                     <span id="live-status">Status: Checking...</span>
                 </div>
             </div>
@@ -111,15 +99,39 @@
         const PROXY_URL = "https://api.mandelli.dev/";
         const PRINTER_STATUS_ENTITY = "sensor.p2s_22e8aj5c1401485_print_status";
         let apiStatus = { weather: false, music: false, github: false, printer: false, ping: false };
-        let statusCycleIndex = 0;
+
+        async function updateWeather() {
+            const locations = [
+                { id: 'weather-carson', lat: 39.16, lon: -119.76 },
+                { id: 'weather-providence', lat: 41.82, lon: -71.41 }
+            ];
+            for (const loc of locations) {
+                try {
+                    const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}&current_weather=true&temperature_unit=fahrenheit`);
+                    const data = await res.json();
+                    document.getElementById(loc.id).innerHTML = `${Math.round(data.current_weather.temperature)}°F`;
+                    apiStatus.weather = true;
+                } catch (e) { apiStatus.weather = false; }
+            }
+        }
 
         async function fetchPingCount() {
             try {
                 const res = await fetch(PROXY_URL + 'ping_count');
                 const data = await res.json();
-                document.getElementById('ping-display').textContent = `[${data.state}]`;
+                document.getElementById('ping-display').textContent = `[${data.state || 0}]`;
                 apiStatus.ping = true;
             } catch (e) { apiStatus.ping = false; }
+        }
+
+        async function updateLastUpdated() {
+            try {
+                const res = await fetch('https://api.github.com/repos/jaycemedo/jaycemedo.github.io/commits/main');
+                const data = await res.json();
+                const date = new Date(data.commit.author.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                document.getElementById('last-updated').textContent = `Last update: ${date}`;
+                apiStatus.github = true;
+            } catch (e) { apiStatus.github = false; }
         }
 
         async function triggerPing() {
@@ -143,72 +155,19 @@
             btn.disabled = false;
         }
 
-        async function checkMusicStatus() {
-            const API_KEY = '452d1e53691b35628314664820db7e1a';
-            const USERNAME = 'jasonmandelli';
-            try {
-                const response = await fetch(`https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${USERNAME}&api_key=${API_KEY}&format=json&limit=1`);
-                const data = await response.json();
-                const isNowPlaying = data.recenttracks.track.some(track => track['@attr'] && track['@attr'].nowplaying === 'true');
-                document.getElementById('music-badge').style.display = isNowPlaying ? 'flex' : 'none';
-                apiStatus.music = true;
-            } catch (e) { apiStatus.music = false; }
-        }
-
-        async function checkPrinterStatus() {
-            try {
-                const response = await fetch(PROXY_URL + PRINTER_STATUS_ENTITY);
-                if (response.ok) {
-                    const data = await response.json();
-                    const status = data.state.toLowerCase().trim();
-                    const badge = document.getElementById('printer-badge');
-                    const isActive = ["printing", "preparing", "running", "busy", "moving"].includes(status);
-                    badge.style.display = isActive ? 'flex' : 'none';
-                    apiStatus.printer = true;
-                }
-            } catch (e) { apiStatus.printer = false; }
-        }
-
-        async function updateWeather() {
-            const locations = [{ id: 'weather-carson', lat: 39.16, lon: -119.76 }, { id: 'weather-providence', lat: 41.82, lon: -71.41 }];
-            for (const loc of locations) {
-                try {
-                    const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}&current_weather=true&temperature_unit=fahrenheit`);
-                    const data = await res.json();
-                    document.getElementById(loc.id).innerHTML = `${Math.round(data.current_weather.temperature)}°F`;
-                    apiStatus.weather = true;
-                } catch (e) { apiStatus.weather = false; }
-            }
-        }
-
-        async function updateLastUpdated() {
-            try {
-                const res = await fetch('https://api.github.com/repos/jaycemedo/jaycemedo.github.io/commits/main');
-                const data = await res.json();
-                const formattedDate = new Date(data.commit.author.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                document.getElementById('last-updated').textContent = `Last update: ${formattedDate}`;
-                apiStatus.github = true;
-            } catch (e) { apiStatus.github = false; }
-        }
-
-        function updateStatusDisplay() {
-            const statusEl = document.getElementById('live-status');
+        function updateStatus() {
             const online = Object.values(apiStatus).filter(Boolean).length;
-            statusEl.innerHTML = `${online}/5 APIs Active`;
+            document.getElementById('live-status').textContent = `System Status: ${online}/5 Active`;
         }
 
-        function startCycles() {
+        function start() {
             updateWeather();
-            updateLastUpdated();
-            checkMusicStatus();
-            checkPrinterStatus();
             fetchPingCount();
-            setInterval(updateStatusDisplay, 5000);
-            setInterval(checkMusicStatus, 30000);
-            setInterval(checkPrinterStatus, 30000);
+            updateLastUpdated();
+            setInterval(updateStatus, 5000);
             setInterval(updateWeather, 600000);
         }
-        startCycles();
+        start();
     </script>
 </body>
 </html>
