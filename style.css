@@ -137,7 +137,6 @@ p { line-height: 1.6; color: rgba(255, 255, 255, 0.7); font-weight: 300; }
     margin-top: 0.75rem;
 }
 
-/* Mobile Responsiveness */
 @media (max-width: 850px) {
     .bento-container { grid-template-columns: 1fr; }
     .header, .footer-status { grid-column: span 1; }
