@@ -191,7 +191,7 @@
         transform: translateX(-2px);
     }
 
-    /* --- PILL BANNER FIX --- */
+    /* --- PILL BANNER --- */
     .custom-banner {
         grid-column: span 2 !important;
         padding: 12px 25px !important;
@@ -298,7 +298,7 @@
                 </div>
                 <div class="guestbook-link-container">
                     <a href="/guestbook.html" class="guestbook-link">
-                     <i class="fas fa-book-open"></i> View Guestbook History
+                     <i class="fas fa-book-open"></i> View Guestbook_History
                     </a>
                 </div>
             </div>
@@ -406,8 +406,7 @@
             try {
                 const response = await fetch(`https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${USERNAME}&api_key=${API_KEY}&format=json&limit=1`);
                 const data = await response.json();
-                const tracks = data.recenttracks.track;
-                const isNowPlaying = tracks.some(track => track['@attr'] && track['@attr'].nowplaying === 'true');
+                const isNowPlaying = data.recenttracks.track.some(track => track['@attr'] && track['@attr'].nowplaying === 'true');
                 document.getElementById('music-badge').style.display = isNowPlaying ? 'flex' : 'none';
                 apiStatus.music = true;
             } catch (e) { apiStatus.music = false; }
@@ -439,16 +438,46 @@
             }
         }
 
+        async function updateLastUpdated() {
+            try {
+                const res = await fetch('https://api.github.com/repos/jaycemedo/jaycemedo.github.io/commits/main');
+                const data = await res.json();
+                const date = new Date(data.commit.author.date);
+                const message = data.commit.message.split('\n')[0];
+                const formattedDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                document.getElementById('last-updated').textContent = `Last update: ${formattedDate} (${message})`;
+                apiStatus.github = true;
+            } catch (e) { apiStatus.github = false; }
+        }
+
+        function updateStatusDisplay() {
+            const statusEl = document.getElementById('live-status');
+            statusEl.classList.add('status-fade-out');
+            setTimeout(() => {
+                const online = Object.values(apiStatus).filter(Boolean).length;
+                const total = Object.keys(apiStatus).length;
+                const isAllOnline = online === total;
+                const messages = [
+                    { text: isAllOnline ? 'All systems operational' : `${online}/${total} APIs online`, icon: isAllOnline ? '✓' : '✕' },
+                    { text: `Weather API: ${apiStatus.weather ? 'Online' : 'Offline'}`, icon: apiStatus.weather ? '✓' : '✕' },
+                    { text: `Music API: ${apiStatus.music ? 'Online' : 'Offline'}`, icon: apiStatus.music ? '✓' : '✕' },
+                    { text: `GitHub API: ${apiStatus.github ? 'Online' : 'Offline'}`, icon: apiStatus.github ? '✓' : '✕' },
+                    { text: `Printer API: ${apiStatus.printer ? 'Online' : 'Offline'}`, icon: apiStatus.printer ? '✓' : '✕' },
+                    { text: `Ping API: ${apiStatus.ping ? 'Online' : 'Offline'}`, icon: apiStatus.ping ? '✓' : '✕' }
+                ];
+                const current = messages[statusCycleIndex % messages.length];
+                const color = current.icon === '✓' ? 'color: #10b981;' : 'color: #ef4444;';
+                statusEl.innerHTML = `<span style="${color}font-weight: bold;">${current.icon}</span> ${current.text}`;
+                statusEl.classList.remove('status-fade-out');
+            }, 300);
+        }
+
         function updateCountdown() {
             const targetDate = new Date('September 1, 2026 00:00:00').getTime();
-            const timer = setInterval(function() {
+            setInterval(function() {
                 const now = new Date().getTime();
                 const diff = targetDate - now;
-                if (diff <= 0) {
-                    clearInterval(timer);
-                    document.querySelector('.banner-content span').textContent = "Target date reached.";
-                    return;
-                }
+                if (diff <= 0) return;
                 document.getElementById('days').textContent = Math.floor(diff / (1000 * 60 * 60 * 24));
                 document.getElementById('hours').textContent = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                 document.getElementById('minutes').textContent = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
@@ -458,12 +487,17 @@
 
         function startCycles() {
             updateWeather();
+            updateLastUpdated();
             checkMusicStatus();
             checkPrinterStatus();
             fetchPingCount();
             updateCountdown();
+            setTimeout(updateStatusDisplay, 1200);
+            setInterval(() => { statusCycleIndex++; updateStatusDisplay(); }, 5000);
             setInterval(checkMusicStatus, 30000);
             setInterval(checkPrinterStatus, 30000);
+            setInterval(updateWeather, 600000);
+            setInterval(fetchPingCount, 60000);
         }
         startCycles();
     </script>
