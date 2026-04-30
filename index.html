@@ -177,32 +177,32 @@
         text-overflow: ellipsis;
     }
     .guestbook-link-container {
-    margin-top: 12px;
-    text-align: right; /* Aligns it under the Ping button */
+        margin-top: 12px;
+        text-align: right; 
     }
 
     .guestbook-link {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.65rem;
-    color: rgba(255, 255, 255, 0.3);
-    text-decoration: none;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    transition: all 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.65rem;
+        color: rgba(255, 255, 255, 0.3);
+        text-decoration: none;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
     }
 
     .guestbook-link:hover {
-    color: #38bdf8; /* Matches your printer/accent blue */
-    transform: translateX(-2px);
+        color: #38bdf8; 
+        transform: translateX(-2px);
     }
 
     .guestbook-link i {
-    font-size: 0.75rem;
+        font-size: 0.75rem;
     }
-    /* --- RESPONSIVE QUALITY OF LIFE FIX --- */
+
     @media (max-width: 480px) {
         .ping-input-wrapper {
             flex-direction: column;
@@ -219,22 +219,23 @@
             height: 44px;
         }
     }
-    /* Badge Link Wrapper */
+
     .badge-link {
-    text-decoration: none;
-    display: contents; /* Keeps the flex layout of the container intact */
+        text-decoration: none;
+        display: contents; 
     }
 
     .badge-link:hover .live-badge {
-    filter: brightness(1.2);
-    transform: translateY(-1px);
-    cursor: pointer;
+        filter: brightness(1.2);
+        transform: translateY(-1px);
+        cursor: pointer;
     }
 </style>
 </head>
 <body>
+    <script src="https://keepandroidopen.org/banner.js"></script>
+
     <main class="bento-container">
-        <script src="https://keepandroidopen.org/banner.js"></script>
         <header class="grid-item header">
             <h1>MANDELLI<span class="dot">.</span>DEV</h1>
             <p class="tagline">// Engineering the Future of IT & Software</p>
@@ -271,7 +272,7 @@
                         <i class="fas fa-bell" id="ping-icon"></i> 
                         <span class="ping-count" id="ping-display">[--]</span>
                         </button>
-                        </div>
+                    </div>
                 </div>
                 <div class="guestbook-link-container">
                     <a href="/guestbook.html" class="guestbook-link">
@@ -386,7 +387,6 @@
                     clearInterval(interval);
                     btn.disabled = false;
                     messageInput.disabled = false;
-                    // Restore original bell icon and display
                     btn.innerHTML = `<i class="fas fa-bell" id="ping-icon"></i> <span class="ping-count" id="ping-display">${document.getElementById('ping-display').textContent}</span>`;
                 } else {
                     btn.innerHTML = `<i class="fas fa-clock"></i> ${remaining}s`;
