@@ -14,7 +14,7 @@
     <script data-goatcounter="https://medo.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 
     <style>
-    /* CSS Variables for Light / Dark Mode */
+    /* Global Theme Custom Properties */
     :root {
         --bg-color: #0b0f19;
         --text-color: #ffffff;
@@ -29,7 +29,7 @@
         --btn-hover: #e2e2e2;
         --ping-btn-bg: rgba(255, 255, 255, 0.1);
         --ping-btn-hover: rgba(255, 255, 255, 0.2);
-        --toggle-bg: rgba(255, 255, 255, 0.08);
+        --toggle-bg: rgba(255, 255, 255, 0.05);
         --toggle-border: rgba(255, 255, 255, 0.15);
         --dot-color: #10b981;
     }
@@ -60,6 +60,33 @@
         margin: 0;
         padding: 0;
         transition: background-color 0.3s ease, color 0.3s ease;
+        position: relative;
+    }
+
+    /* Out-of-the-way, sleek floating Theme Toggle */
+    .theme-toggle-btn {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        background: var(--toggle-bg);
+        border: 1px solid var(--toggle-border);
+        color: var(--text-color);
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 1rem;
+        backdrop-filter: blur(8px);
+        transition: all 0.2s ease;
+    }
+
+    .theme-toggle-btn:hover {
+        transform: scale(1.08);
+        border-color: var(--card-hover-border);
     }
 
     .bento-container {
@@ -83,50 +110,28 @@
         border-color: var(--card-hover-border);
     }
 
-    /* Header & Theme Toggle */
+    /* Original Header Layout */
     .header {
         grid-column: span 2;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+        text-align: center;
     }
 
-    .header-content h1 {
+    .header h1 {
         margin: 0;
         font-size: 1.8rem;
         font-weight: 800;
         letter-spacing: -0.5px;
     }
 
-    .header-content .dot {
+    .header .dot {
         color: var(--dot-color);
     }
 
-    .header-content .tagline {
+    .header .tagline {
         margin: 6px 0 0 0;
         font-family: 'JetBrains Mono', monospace;
         font-size: 0.8rem;
         color: var(--text-muted);
-    }
-
-    .theme-toggle-btn {
-        background: var(--toggle-bg);
-        border: 1px solid var(--toggle-border);
-        color: var(--text-color);
-        width: 42px;
-        height: 42px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        font-size: 1.1rem;
-        transition: all 0.2s ease;
-    }
-
-    .theme-toggle-btn:hover {
-        transform: scale(1.05);
-        border-color: var(--card-hover-border);
     }
 
     /* Profile Cards */
@@ -422,19 +427,24 @@
         .status-meta {
             align-items: flex-start;
         }
+
+        .theme-toggle-btn {
+            top: 12px;
+            right: 12px;
+        }
     }
     </style>
 </head>
 <body>
+    <!-- Fixed sleek theme toggle out of the way -->
+    <button class="theme-toggle-btn" id="theme-toggle" aria-label="Toggle theme">
+        <i class="fas fa-moon" id="theme-icon"></i>
+    </button>
+
     <main class="bento-container">
         <header class="grid-item header">
-            <div class="header-content">
-                <h1>MANDELLI<span class="dot">.</span>DEV</h1>
-                <p class="tagline">// Engineering the Future of IT & Software</p>
-            </div>
-            <button class="theme-toggle-btn" id="theme-toggle" aria-label="Toggle theme">
-                <i class="fas fa-moon" id="theme-icon"></i>
-            </button>
+            <h1>MANDELLI<span class="dot">.</span>DEV</h1>
+            <p class="tagline">// Engineering the Future of IT & Software</p>
         </header>
 
         <section class="grid-item profile-card your-card">
