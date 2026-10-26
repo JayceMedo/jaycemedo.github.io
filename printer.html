@@ -165,7 +165,7 @@
     async function updateDashboard() {
         try {
             // Update Camera Feed
-            document.getElementById('camera-stream').src = `${PROXY_URL}${CAMERA_ENTITY}?t=${Date.now()}`;
+            document.getElementById('camera-stream').src = `${PROXY_URL}camera-feed?t=${Date.now()}`;
             
             // Fetch all sensors
             const results = await Promise.all(Object.keys(SENSORS).map(id => fetch(PROXY_URL + id).then(res => res.json())));
