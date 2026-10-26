@@ -6,7 +6,7 @@
     <title>Mandelli.dev</title>
     
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;800&family=JetBrains+Mono:wght@400;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90' font-family='Arial, sans-serif' fill='%23ffffff'%3EM%3C/text%3E%3C/svg%3E">
@@ -14,21 +14,168 @@
     <script data-goatcounter="https://medo.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 
     <style>
+    /* CSS Variables for Light / Dark Mode */
+    :root {
+        --bg-color: #0b0f19;
+        --text-color: #ffffff;
+        --text-muted: rgba(255, 255, 255, 0.6);
+        --text-subtle: rgba(255, 255, 255, 0.4);
+        --card-bg: rgba(255, 255, 255, 0.03);
+        --card-border: rgba(255, 255, 255, 0.1);
+        --card-hover-border: rgba(255, 255, 255, 0.25);
+        --input-bg: rgba(255, 255, 255, 0.05);
+        --btn-bg: #ffffff;
+        --btn-text: #000000;
+        --btn-hover: #e2e2e2;
+        --ping-btn-bg: rgba(255, 255, 255, 0.1);
+        --ping-btn-hover: rgba(255, 255, 255, 0.2);
+        --toggle-bg: rgba(255, 255, 255, 0.08);
+        --toggle-border: rgba(255, 255, 255, 0.15);
+        --dot-color: #10b981;
+    }
+
+    [data-theme="light"] {
+        --bg-color: #f4f6fb;
+        --text-color: #0f172a;
+        --text-muted: #475569;
+        --text-subtle: #94a3b8;
+        --card-bg: #ffffff;
+        --card-border: rgba(15, 23, 42, 0.08);
+        --card-hover-border: rgba(15, 23, 42, 0.2);
+        --input-bg: rgba(15, 23, 42, 0.04);
+        --btn-bg: #0f172a;
+        --btn-text: #ffffff;
+        --btn-hover: #334155;
+        --ping-btn-bg: rgba(15, 23, 42, 0.06);
+        --ping-btn-hover: rgba(15, 23, 42, 0.12);
+        --toggle-bg: rgba(15, 23, 42, 0.05);
+        --toggle-border: rgba(15, 23, 42, 0.15);
+        --dot-color: #059669;
+    }
+
+    body {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        font-family: 'Inter', sans-serif;
+        margin: 0;
+        padding: 0;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .bento-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 40px 20px;
+    }
+
+    .grid-item {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 16px;
+        padding: 24px;
+        transition: border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .grid-item:hover {
+        border-color: var(--card-hover-border);
+    }
+
+    /* Header & Theme Toggle */
+    .header {
+        grid-column: span 2;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .header-content h1 {
+        margin: 0;
+        font-size: 1.8rem;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+    }
+
+    .header-content .dot {
+        color: var(--dot-color);
+    }
+
+    .header-content .tagline {
+        margin: 6px 0 0 0;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+    }
+
+    .theme-toggle-btn {
+        background: var(--toggle-bg);
+        border: 1px solid var(--toggle-border);
+        color: var(--text-color);
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 1.1rem;
+        transition: all 0.2s ease;
+    }
+
+    .theme-toggle-btn:hover {
+        transform: scale(1.05);
+        border-color: var(--card-hover-border);
+    }
+
+    /* Profile Cards */
+    .profile-card {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .profile-card .label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        color: var(--text-subtle);
+        letter-spacing: 1px;
+        margin-bottom: 8px;
+    }
+
+    .profile-card h2 {
+        margin: 0 0 10px 0;
+        font-size: 1.4rem;
+        font-weight: 800;
+    }
+
+    .profile-card p {
+        margin: 0;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+
     /* Live Badge Styles */
     .badge-container {
         display: flex;
         gap: 8px;
-        justify-content: center;
+        justify-content: flex-start;
         margin-bottom: 12px;
         min-height: 28px;
+    }
+
+    .badge-link {
+        text-decoration: none;
     }
 
     .live-badge {
         display: flex;
         align-items: center;
         gap: 6px;
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: var(--input-bg);
+        border: 1px solid var(--card-border);
         padding: 4px 10px;
         border-radius: 20px;
         font-size: 0.65rem;
@@ -66,6 +213,7 @@
         opacity: 0 !important;
     }
 
+    /* Buttons & Form Elements */
     .btn-group {
         display: grid;
         grid-template-columns: 1fr 1fr; 
@@ -78,22 +226,21 @@
 
     .ping-input-wrapper {
         display: flex;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: var(--input-bg);
+        border: 1px solid var(--card-border);
         border-radius: 8px;
         overflow: hidden;
         transition: all 0.2s ease;
     }
 
     .ping-input-wrapper:focus-within {
-        border-color: rgba(255, 255, 255, 0.3);
-        background: rgba(255, 255, 255, 0.08);
+        border-color: var(--card-hover-border);
     }
 
     #ping-message {
         background: transparent;
         border: none;
-        color: white;
+        color: var(--text-color);
         padding: 0 12px;
         font-family: 'Inter', sans-serif;
         font-size: 0.8rem;
@@ -103,7 +250,7 @@
     }
 
     #ping-message::placeholder {
-        color: rgba(255, 255, 255, 0.3);
+        color: var(--text-subtle);
     }
 
     .btn, .ping-btn {
@@ -127,27 +274,27 @@
     }
 
     .btn {
-        background: #ffffff !important;
-        color: #000000 !important;
-        border: 1px solid #ffffff;
+        background: var(--btn-bg) !important;
+        color: var(--btn-text) !important;
+        border: 1px solid var(--btn-bg);
     }
 
     .btn:hover {
-        background: #e2e2e2 !important;
+        background: var(--btn-hover) !important;
         transform: translateY(-1px);
     }
 
     .ping-btn {
-        background: rgba(255, 255, 255, 0.1);
-        color: #ffffff;
+        background: var(--ping-btn-bg);
+        color: var(--text-color);
         border: none;
-        border-left: 1px solid rgba(255, 255, 255, 0.1);
+        border-left: 1px solid var(--card-border);
         gap: 8px;
         border-radius: 0;
     }
 
     .ping-btn:hover:not(:disabled) {
-        background: rgba(255, 255, 255, 0.2);
+        background: var(--ping-btn-hover);
     }
 
     .ping-btn:disabled {
@@ -158,7 +305,7 @@
     .ping-count {
         font-family: 'JetBrains Mono', monospace;
         font-weight: 800;
-        opacity: 0.5;
+        opacity: 0.7;
         font-size: 0.75rem;
     }
 
@@ -176,7 +323,7 @@
     .guestbook-link {
         font-family: 'JetBrains Mono', monospace;
         font-size: 0.65rem;
-        color: rgba(255, 255, 255, 0.3);
+        color: var(--text-subtle);
         text-decoration: none;
         text-transform: uppercase;
         letter-spacing: 1px;
@@ -190,13 +337,104 @@
         color: #38bdf8;
         transform: translateX(-2px);
     }
+
+    /* Footer Status Bar */
+    .footer-status {
+        grid-column: span 2;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        font-size: 0.75rem;
+        font-family: 'JetBrains Mono', monospace;
+        color: var(--text-muted);
+    }
+
+    .status-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .coord-box {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .meta-label {
+        font-weight: 800;
+        color: var(--text-color);
+    }
+
+    .meta-value {
+        color: var(--text-subtle);
+        font-size: 0.65rem;
+    }
+
+    .weather-info {
+        color: var(--text-muted);
+    }
+
+    .coord-divider {
+        width: 1px;
+        height: 24px;
+        background: var(--card-border);
+    }
+
+    .github-links {
+        display: flex;
+        gap: 12px;
+    }
+
+    .gh-link {
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+    .gh-link:hover {
+        color: var(--text-color);
+    }
+
+    .status-meta {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+    }
+
+    @media (max-width: 768px) {
+        .bento-container {
+            grid-template-columns: 1fr;
+        }
+
+        .header, .footer-status {
+            grid-column: span 1;
+        }
+
+        .footer-status {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .status-meta {
+            align-items: flex-start;
+        }
+    }
     </style>
 </head>
 <body>
     <main class="bento-container">
         <header class="grid-item header">
-            <h1>MANDELLI<span class="dot">.</span>DEV</h1>
-            <p class="tagline">// Engineering the Future of IT & Software</p>
+            <div class="header-content">
+                <h1>MANDELLI<span class="dot">.</span>DEV</h1>
+                <p class="tagline">// Engineering the Future of IT & Software</p>
+            </div>
+            <button class="theme-toggle-btn" id="theme-toggle" aria-label="Toggle theme">
+                <i class="fas fa-moon" id="theme-icon"></i>
+            </button>
         </header>
 
         <section class="grid-item profile-card your-card">
@@ -254,20 +492,20 @@
                 <div class="coord-box">
                     <span class="meta-label">Carson City, NV</span> 
                     <span class="meta-value">39.16° N, 119.76° W</span>
-                    <div class="weather-info" id="weather-carson"></div>
+                    <div class="weather-info" id="weather-carson">Loading...</div>
                 </div>
                 <div class="coord-divider"></div>
                 <div class="coord-box">
                     <span class="meta-label">Providence, RI</span> 
                     <span class="meta-value">41.82° N, 71.41° W</span>
-                    <div class="weather-info" id="weather-providence"></div>
+                    <div class="weather-info" id="weather-providence">Loading...</div>
                 </div>
             </div>
             
             <div class="status-middle">
                 <div class="github-links">
-                    <a href="https://github.com/jaycemedo" class="gh-link"><i class="fab fa-github"></i> JASON GITHUB</a>
-                    <a href="https://github.com/dannymandelli" class="gh-link"><i class="fab fa-github"></i> DANIEL GITHUB</a>
+                    <a href="https://github.com/jaycemedo" target="_blank" class="gh-link"><i class="fab fa-github"></i> JASON GITHUB</a>
+                    <a href="https://github.com/dannymandelli" target="_blank" class="gh-link"><i class="fab fa-github"></i> DANIEL GITHUB</a>
                 </div>
             </div>
             
@@ -281,6 +519,36 @@
     </main>
 
     <script>
+        // --- Theme Toggle Logic ---
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+
+        function setTheme(theme) {
+            if (theme === 'light') {
+                document.documentElement.setAttribute('data-theme', 'light');
+                themeIcon.className = 'fas fa-sun';
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+                themeIcon.className = 'fas fa-moon';
+            }
+            localStorage.setItem('theme', theme);
+        }
+
+        const savedTheme = localStorage.getItem('theme');
+        const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+
+        if (savedTheme === 'light' || (!savedTheme && prefersLight)) {
+            setTheme('light');
+        } else {
+            setTheme('dark');
+        }
+
+        themeToggleBtn.addEventListener('click', () => {
+            const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+            setTheme(isLight ? 'dark' : 'light');
+        });
+
+        // --- Live API & Status Logic ---
         const PROXY_URL = "https://api.mandelli.dev/";
         const PRINTER_STATUS_ENTITY = "sensor.p2s_22e8aj5c1401485_print_status";
         let apiStatus = { weather: false, music: false, github: false, printer: false, ping: false };
@@ -315,8 +583,14 @@
                     if(data.count) display.textContent = `[${data.count}]`;
                     messageInput.value = ""; 
                     startCooldown(120); 
+                } else {
+                    throw new Error('Ping failed');
                 }
-            } catch (e) { icon.className = "fas fa-exclamation-triangle"; btn.disabled = false; messageInput.disabled = false; }
+            } catch (e) { 
+                icon.className = "fas fa-exclamation-triangle"; 
+                btn.disabled = false; 
+                messageInput.disabled = false; 
+            }
         }
 
         function startCooldown(seconds) {
