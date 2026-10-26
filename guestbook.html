@@ -64,9 +64,10 @@
             font-size: 0.9rem;
             color: rgba(255, 255, 255, 0.8);
             line-height: 1.5;
+            word-break: break-word;
         }
 
-        /* NEW: Pagination Styles */
+        /* Pagination Styles */
         .pagination-ctrls {
             display: flex;
             justify-content: center;
@@ -139,7 +140,11 @@
                 allLogs = await res.json();
 
                 if (allLogs.length === 0) {
-                    listEl.innerHTML = '<div class="loader">Archive is empty.</div>';
+                    listEl.textContent = '';
+                    const emptyEl = document.createElement('div');
+                    emptyEl.className = 'loader';
+                    emptyEl.textContent = 'Archive is empty.';
+                    listEl.appendChild(emptyEl);
                     return;
                 }
 
@@ -148,7 +153,12 @@
                 
                 renderPage();
             } catch (e) {
-                listEl.innerHTML = '<div class="loader" style="color: #ef4444;">ERROR: FAILED_TO_LOAD_ARCHIVE</div>';
+                listEl.textContent = '';
+                const errEl = document.createElement('div');
+                errEl.className = 'loader';
+                errEl.style.color = '#ef4444';
+                errEl.textContent = 'ERROR: FAILED_TO_LOAD_ARCHIVE';
+                listEl.appendChild(errEl);
             }
         }
 
@@ -156,43 +166,72 @@
             const listEl = document.getElementById('log-list');
             const pgEl = document.getElementById('pagination');
             
+            // Clear existing log nodes safely
+            listEl.textContent = '';
+            
             // Calculate slice
             const start = (currentPage - 1) * itemsPerPage;
             const end = start + itemsPerPage;
             const pageData = allLogs.slice(start, end);
 
-            // Render log entries
-            listEl.innerHTML = pageData.map(entry => `
-                <div class="log-entry">
-                    <div class="log-meta">
-                        <span>ENTRY_ID: ${entry.id}</span>
-                        <span>${new Date(entry.date).toLocaleString()}</span>
-                    </div>
-                    <div class="log-text">${entry.message}</div>
-                </div>
-            `).join('');
+            // XSS SAFE RENDER: Explicit DOM Node creation with .textContent assignment
+            pageData.forEach(entry => {
+                const entryCard = document.createElement('div');
+                entryCard.className = 'log-entry';
 
-            // Render Pagination Buttons
+                const metaDiv = document.createElement('div');
+                metaDiv.className = 'log-meta';
+
+                const idSpan = document.createElement('span');
+                idSpan.textContent = `ENTRY_ID: ${entry.id ?? '----'}`;
+
+                const dateSpan = document.createElement('span');
+                const parsedDate = new Date(entry.date);
+                dateSpan.textContent = isNaN(parsedDate) ? String(entry.date ?? '') : parsedDate.toLocaleString();
+
+                metaDiv.appendChild(idSpan);
+                metaDiv.appendChild(dateSpan);
+
+                const textDiv = document.createElement('div');
+                textDiv.className = 'log-text';
+                textDiv.textContent = entry.message ?? ''; // Safely escapes raw HTML / JS payloads
+
+                entryCard.appendChild(metaDiv);
+                entryCard.appendChild(textDiv);
+
+                listEl.appendChild(entryCard);
+            });
+
+            // Render Pagination Controls
             const totalPages = Math.ceil(allLogs.length / itemsPerPage);
+            pgEl.textContent = ''; // Clear container
+
             if (totalPages > 1) {
-                pgEl.innerHTML = `
-                    <button class="pg-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="changePage(-1)">
-                        <i class="fas fa-chevron-left"></i> PREV
-                    </button>
-                    <span style="color: rgba(255,255,255,0.5)">PAGE ${currentPage} / ${totalPages}</span>
-                    <button class="pg-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="changePage(1)">
-                        NEXT <i class="fas fa-chevron-right"></i>
-                    </button>
-                `;
-            } else {
-                pgEl.innerHTML = '';
+                const prevBtn = document.createElement('button');
+                prevBtn.className = 'pg-btn';
+                prevBtn.disabled = currentPage === 1;
+                prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i> PREV';
+                prevBtn.addEventListener('click', () => changePage(-1));
+
+                const pageIndicator = document.createElement('span');
+                pageIndicator.style.color = 'rgba(255,255,255,0.5)';
+                pageIndicator.textContent = `PAGE ${currentPage} / ${totalPages}`;
+
+                const nextBtn = document.createElement('button');
+                nextBtn.className = 'pg-btn';
+                nextBtn.disabled = currentPage === totalPages;
+                nextBtn.innerHTML = 'NEXT <i class="fas fa-chevron-right"></i>';
+                nextBtn.addEventListener('click', () => changePage(1));
+
+                pgEl.appendChild(prevBtn);
+                pgEl.appendChild(pageIndicator);
+                pgEl.appendChild(nextBtn);
             }
         }
 
         function changePage(step) {
             currentPage += step;
             renderPage();
-            // Scroll back to top of logs
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
